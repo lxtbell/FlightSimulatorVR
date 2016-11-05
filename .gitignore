@@ -240,3 +240,14 @@ ModelManifest.xml
 
 # FAKE - F# Make
 .fake/
+
+# JetBrains
+.idea/
+
+# Unreal
+Binaries/
+Config/
+Content/
+Debug/
+Intermediate/
+Saved/
