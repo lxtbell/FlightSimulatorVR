@@ -16,22 +16,9 @@
 
 AFlightSimulatorVRPawn::AFlightSimulatorVRPawn()
 {
-	// Structure to hold one-time initialization
-	//struct FConstructorStatics
-	//{
-	//	ConstructorHelpers::FObjectFinderOptional<UStaticMesh> PlaneMesh;
-	//	FConstructorStatics()
-	//		: PlaneMesh(TEXT("/Game/Flying/Meshes/UFO.UFO"))
-	//	{
-	//	}
-	//};
-	//static FConstructorStatics ConstructorStatics;
-
 	// Create static mesh component
 	//PlaneMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PlaneMesh0"));
 	//RootComponent = PlaneMesh;
-
-	bCanBeDamaged = false;
 
 	Plane = CreateDefaultSubobject<UDestructibleComponent>(TEXT("Plane0"));
 	//Plane->SetCollisionProfileName(TEXT("OverlapAll"));
@@ -87,6 +74,11 @@ AFlightSimulatorVRPawn::AFlightSimulatorVRPawn()
 	SelfDestructionDamage = 25000.f;
 	SelfDestructionRadius = 200.f;
 	SelfDestructionImpulse = 0.f;
+
+	CurrentStage = Stage::Created;
+
+	bCanBeDamaged = false;
+	Plane->SetVisibility(false);
 }
 
 
@@ -102,8 +94,6 @@ void AFlightSimulatorVRPawn::BeginPlay()
 	CurrentPitchSpeed = 0.f;
 	CurrentYawSpeed = 0.f;
 	CurrentRollSpeed = 0.f;
-
-	bExploded = false;
 
 	MissileTemplate = nullptr;
 	for (TActorIterator<AMissile> ActorItr(GetWorld()); ActorItr; ++ActorItr) {
@@ -126,7 +116,7 @@ void AFlightSimulatorVRPawn::Tick(float DeltaSeconds)
 	//if (rand() % 100 == 0)
 	//	UE_LOG(LogTemp, Warning, TEXT("AFlightSimulatorVRPawn::Tick [CurrentForwardSpeed = %.4f] [bExploded = %d] [GetActorLocation = %s] [GetActorRotation = %s]"), CurrentForwardSpeed, bExploded ? 1 : 0, *GetActorLocation().ToString(), *GetActorRotation().ToString());
 
-	if (!bExploded)
+	if (CurrentStage == Stage::Flying)
 	{
 		const FVector LocalMove = FVector(CurrentForwardSpeed * DeltaSeconds, 0.f, 0.f);
 
@@ -142,7 +132,7 @@ void AFlightSimulatorVRPawn::Tick(float DeltaSeconds)
 		// Rotate plane
 		AddActorLocalRotation(FQuat(DeltaRotation));
 	}
-	else
+	else if (CurrentStage == Stage::Exploded)
 	{
 		SpringArm->TargetArmLength = FMath::FInterpTo(SpringArm->TargetArmLength, ExplodedCameraDistance, GetWorld()->GetDeltaSeconds(), 2.f);
 	}
@@ -154,7 +144,7 @@ void AFlightSimulatorVRPawn::NotifyHit(class UPrimitiveComponent* MyComp, class 
 
 	UE_LOG(LogTemp, Warning, TEXT("AFlightSimulatorVRPawn::NotifyHit %s"), *Other->GetName());
 
-	if (!bExploded)
+	if (CurrentStage == Stage::Flying)
 	{
 		bool bExplode = true;
 
@@ -186,7 +176,7 @@ void AFlightSimulatorVRPawn::NotifyHit(class UPrimitiveComponent* MyComp, class 
 			Explosion->Activate();
 			RadialForce->FireImpulse();
 			ExplosionSound->Play();
-			bExploded = true;
+			CurrentStage = Stage::Exploded;
 		}
 	}
 }
@@ -198,6 +188,16 @@ float AFlightSimulatorVRPawn::TakeDamage(float DamageAmount, struct FDamageEvent
 	UE_LOG(LogTemp, Warning, TEXT("AFlightSimulatorVRPawn::TakeDamage %.4f %s"), ActualDamage, *DamageCauser->GetName());
 
 	return ActualDamage;
+}
+
+void AFlightSimulatorVRPawn::StartFlying()
+{
+	if (CurrentStage != Stage::Created)
+		return;
+
+	CurrentStage = Stage::Flying;
+	
+	Plane->SetVisibility(true);
 }
 
 void AFlightSimulatorVRPawn::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
@@ -228,6 +228,9 @@ void AFlightSimulatorVRPawn::StopFire()
 
 void AFlightSimulatorVRPawn::PitchUpInput(float Val)
 {
+	if (CurrentStage != Stage::Flying)
+		return;
+
 	// Target pitch speed is based in input
 	float TargetPitchSpeed = (Val * PitchSpeed);
 
@@ -240,6 +243,9 @@ void AFlightSimulatorVRPawn::PitchUpInput(float Val)
 
 void AFlightSimulatorVRPawn::YawRightInput(float Val)
 {
+	if (CurrentStage != Stage::Flying)
+		return;
+
 	// Target yaw speed is based on input
 	float TargetYawSpeed = (Val * YawSpeed);
 
@@ -259,6 +265,9 @@ void AFlightSimulatorVRPawn::YawRightInput(float Val)
 
 void AFlightSimulatorVRPawn::ThrustInput(float Val)
 {
+	if (CurrentStage != Stage::Flying)
+		return;
+
 	// Is there no input?
 	//bool bHasInput = !FMath::IsNearlyEqual(Val, 0.f);
 
@@ -274,6 +283,9 @@ void AFlightSimulatorVRPawn::ThrustInput(float Val)
 
 void AFlightSimulatorVRPawn::RollRightInput(float Val)
 {
+	if (CurrentStage != Stage::Flying)
+		return;
+
 	// Target roll speed is based on input
 	float TargetRollSpeed = (Val * RollSpeed);
 
@@ -283,6 +295,9 @@ void AFlightSimulatorVRPawn::RollRightInput(float Val)
 
 void AFlightSimulatorVRPawn::Fire()
 {
+	if (CurrentStage != Stage::Flying)
+		return;
+
 	FRotator ActorRotation = GetActorRotation();
 
 	// Make a location for the new actor to spawn at

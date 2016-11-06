@@ -47,6 +47,8 @@ public:
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const & DamageEvent, class AController * EventInstigator, class AActor * DamageCauser) override;
 	// End AActor overrides
 
+	virtual void StartFlying();
+
 protected:
 	// Begin APawn overrides
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override; // Allows binding actions/axes to functions
@@ -127,14 +129,20 @@ private:
 	/** Current roll speed */
 	float CurrentRollSpeed;
 
-	bool bExploded;
-
 	FTimerHandle FireTimerHandle;
 
 	class AMissile* MissileTemplate;
 
 	int32 TotalMissiles;
 	int32 CurrentMissile;
+
+	enum class Stage
+	{
+		Created,
+		Flying,
+		Exploded
+	};
+	Stage CurrentStage;
 
 public:
 	/** Returns PlaneMesh subobject **/

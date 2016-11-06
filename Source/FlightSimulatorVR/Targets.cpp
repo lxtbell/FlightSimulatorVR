@@ -58,8 +58,8 @@ void ATargets::BeginPlay()
 
 		FRotator Rotation(FMath::RandRange(0.f, 360.f), FMath::RandRange(0.f, 360.f), FMath::RandRange(0.f, 360.f));
 
-		if (SphereTemplate != nullptr)
-			UE_LOG(LogTemp, Warning, TEXT("ATargets::BeginPlay %s %s"), *Location.ToString(), *SphereTemplate->GetName());
+		//if (SphereTemplate != nullptr)
+		//	UE_LOG(LogTemp, Warning, TEXT("ATargets::BeginPlay %s %s"), *Location.ToString(), *SphereTemplate->GetName());
 
 		Spheres.Add({ Location, Rotation, SpawnSphere(Location, Rotation) });
 	}
