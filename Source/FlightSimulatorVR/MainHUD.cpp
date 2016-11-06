@@ -80,7 +80,8 @@ void AMainHUD::PostRender()
 				WhiteColor, ScreenX * 0.2, ScreenY * 0.9, MenuFont, FontScale * 40);
 		break;
 	case Mode::GameOver:
-		DrawText(TEXT("Wasted"), RedColor, ScreenX * 0.4, ScreenY * 0.4, WastedFont, FontScale * 100);
+		DrawText(TEXT("Wasted"), RedColor, ScreenX * 0.4, ScreenY * 0.4, WastedFont, FontScale * 110);
+		Buttons[TEXT("Exit Game")]->Set(ScreenX * 0.9, ScreenY * 0.95, MenuFont, FontScale * 40, FVector2D(6, 1.5) * FontSize * 60)->Draw(this);
 		break;
 	}
 }
@@ -122,7 +123,7 @@ void AMainHUD::UButtonStartWithTutorial::NotifyHitBoxClick(class AMainHUD* HUD)
 
 void AMainHUD::UButtonExitGame::NotifyHitBoxClick(class AMainHUD* HUD)
 {
-	HUD->GetWorld()->GetFirstPlayerController()->ConsoleCommand("quit");
+	HUD->GetOwningPlayerController()->ConsoleCommand("quit");
 }
 
 void AMainHUD::NotifyHitBoxBeginCursorOver(FName BoxName)

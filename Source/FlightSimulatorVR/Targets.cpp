@@ -64,15 +64,9 @@ void ATargets::BeginPlay()
 
 		Spheres.Add({ Location, Rotation, SpawnSphere(Location, Rotation) });
 	}
-
-	APlayerState* PlayerState = GetWorld()->GetFirstPlayerController()->PlayerState;
-	if (PlayerState->IsA(APilotState::StaticClass()))
-		PilotState = Cast<APilotState>(PlayerState);
-	else
-		PilotState = nullptr;
 }
 
-void ATargets::OnTargetHit(AActor* Target, const FVector & Location)
+void ATargets::OnTargetHit(AActor* Target, const FVector & Location, class APilotState* PilotState)
 {
 	UE_LOG(LogTemp, Warning, TEXT("ATargets::OnTargetHit %s"), *Target->GetName());
 

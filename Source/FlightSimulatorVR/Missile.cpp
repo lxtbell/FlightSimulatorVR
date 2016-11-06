@@ -56,7 +56,7 @@ void AMissile::BeginPlay()
 	CurrentForwardSpeed = InitialSpeed;
 }
 
-void AMissile::Activate(float LaunchSpeed, class AActor* MissileLauncher)
+void AMissile::Activate(float LaunchSpeed, class AActor* MissileLauncher, class APilotState* LauncherPilotState)
 {
 	if (CurrentStage != Stage::Created)
 		return;
@@ -75,6 +75,7 @@ void AMissile::Activate(float LaunchSpeed, class AActor* MissileLauncher)
 	GetWorldTimerManager().SetTimer(SelfDestoryTimerHandle, this, &AMissile::Explode, FlyTime);
 
 	Launcher = MissileLauncher;
+	PilotState = LauncherPilotState;
 
 	//UE_LOG(LogTemp, Warning, TEXT("AMissile::Activate %.4f"), CurrentForwardSpeed);
 }
@@ -120,7 +121,7 @@ void AMissile::NotifyHit(class UPrimitiveComponent* MyComp, class AActor* Other,
 		{
 			AActor* OtherOwner = Other->GetOwner();
 			if (OtherOwner && OtherOwner->IsA(ATargets::StaticClass()))
-				Cast<ATargets>(OtherOwner)->OnTargetHit(Other, HitLocation);
+				Cast<ATargets>(OtherOwner)->OnTargetHit(Other, HitLocation, PilotState);
 		}
 			
 		Explode();
