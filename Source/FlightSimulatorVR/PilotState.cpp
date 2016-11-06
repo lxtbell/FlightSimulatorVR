@@ -9,7 +9,7 @@ APilotState::APilotState()
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	StreakTime = 10.f;
+	StreakTime = 4.f;
 
 	Score = 0.f;
 	SecondsPlayed = 0.f;
