@@ -55,11 +55,18 @@ private:
 
 	struct UButton
 	{
-		FName ButtonName; FLinearColor ButtonNormalColor, ButtonHighlightColor;
+		FString ButtonName; FLinearColor ButtonNormalColor, ButtonHighlightColor;
 		FVector2D ButtonScreenLocation; UFont* ButtonFont; float ButtonFontScale; FVector2D ButtonHitBoxScale; 
 		FLinearColor CurrentColor;
 
-		UButton* Set(FName Name, FLinearColor NormalColor, FLinearColor HighlightColor)
+		enum class Alignment
+		{
+			TopLeft,
+			Center,
+			BottomRight
+		};
+
+		UButton* Set(FString Name, FLinearColor NormalColor, FLinearColor HighlightColor)
 		{
 			ButtonName = Name; ButtonNormalColor = NormalColor; ButtonHighlightColor = HighlightColor;
 			CurrentColor = ButtonNormalColor;
@@ -74,10 +81,21 @@ private:
 			return this;
 		}
 
-		UButton* Draw(class AMainHUD* HUD)
+		UButton* Draw(class AMainHUD* HUD, Alignment TextAlignment = Alignment::TopLeft)
 		{
-			HUD->DrawText(ButtonName.ToString(), CurrentColor, ButtonScreenLocation.X, ButtonScreenLocation.Y, ButtonFont, ButtonFontScale);
-			HUD->AddHitBox(ButtonScreenLocation, ButtonHitBoxScale, ButtonName, true);
+			FVector2D ScreenLocation = ButtonScreenLocation;
+			switch (TextAlignment)
+			{
+			case Alignment::Center:
+				ScreenLocation -= ButtonHitBoxScale / 2;
+				break;
+			case Alignment::BottomRight:
+				ScreenLocation -= ButtonHitBoxScale;
+				break;
+			}
+
+			HUD->DrawText(ButtonName, CurrentColor, ScreenLocation.X, ScreenLocation.Y, ButtonFont, ButtonFontScale);
+			HUD->AddHitBox(ScreenLocation, ButtonHitBoxScale, FName(*ButtonName), true);
 
 			return this;
 		}

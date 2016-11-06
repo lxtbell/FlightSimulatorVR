@@ -29,9 +29,14 @@ AMainHUD::AMainHUD()
 	MenuFont = ConstructorStatics.MenuFont.Get();
 	WastedFont = ConstructorStatics.WastedFont.Get();
 
-	Buttons.Add("Start Game", (new UButtonStartGame())->Set("Start Game", WhiteColor, RedColor));
-	Buttons.Add("Start With Tutorial", (new UButtonStartWithTutorial())->Set("Start With Tutorial", WhiteColor, RedColor));
-	Buttons.Add("Exit Game", (new UButtonExitGame())->Set("Exit Game", WhiteColor, RedColor));
+	Buttons.Add(TEXT("Flight Simulator VR"), (new UButton())->Set(TEXT("Flight Simulator VR"), WhiteColor, RedColor));
+	Buttons.Add(TEXT("Start Game"), (new UButtonStartGame())->Set(TEXT("Start Game"), WhiteColor, RedColor));
+	Buttons.Add(TEXT("Start With Tutorial"), (new UButtonStartWithTutorial())->Set(TEXT("Start With Tutorial"), WhiteColor, RedColor));
+	Buttons.Add(TEXT("Exit Game"), (new UButtonExitGame())->Set(TEXT("Exit Game"), WhiteColor, RedColor));
+
+	Buttons.Add(TEXT("Statistics"), (new UButton())->Set(TEXT("Statistics"), WhiteColor, WhiteColor));
+
+	Buttons.Add(TEXT("Wasted"), (new UButton())->Set(TEXT("Wasted"), RedColor, RedColor));
 }
 
 // Called when the game starts or when spawned
@@ -64,26 +69,28 @@ void AMainHUD::PostRender()
 	{
 	case Mode::MainMenu:
 		DrawTexture(MenuBackground, 0, 0, ScreenX, ScreenY, 0, 0, 1, 1);
-		DrawText(TEXT("Flight Simulator VR"), WhiteColor, ScreenX * 0.3, ScreenY * 0.1, MenuFont, FontScale * 120);
+		Buttons[TEXT("Flight Simulator VR")]->Set(ScreenX * 0.3, ScreenY * 0.1, MenuFont, FontScale * 120, FVector2D(12, 1.5) * FontSize * 120)->Draw(this);
 
 		Buttons[TEXT("Start Game")]->Set(ScreenX * 0.1, ScreenY * 0.6, MenuFont, FontScale * 60, FVector2D(6.6, 1.5) * FontSize * 60)->Draw(this);
 		Buttons[TEXT("Start With Tutorial")]->Set(ScreenX * 0.1, ScreenY * 0.7, MenuFont, FontScale * 60, FVector2D(11, 1.5) * FontSize * 60)->Draw(this);
 		Buttons[TEXT("Exit Game")]->Set(ScreenX * 0.1, ScreenY * 0.8, MenuFont, FontScale * 60, FVector2D(6, 1.5) * FontSize * 60)->Draw(this);
-
-		//RenderHitBoxes(Canvas->Canvas);
 		break;
 	case Mode::InGameTutorial:
 	case Mode::InGame:
 		if (PilotState != nullptr)
-			DrawText(FString::Printf(TEXT("Score %.0f\tScore Per Minute %.0f\tAccuracy %.2f\tCurrentStreak %d"), 
-				PilotState->Score, PilotState->Score / PilotState->SecondsPlayed * 60, PilotState->MissileHit / PilotState->MissileFired, PilotState->CurrentStreak), 
-				WhiteColor, ScreenX * 0.2, ScreenY * 0.9, MenuFont, FontScale * 40);
+			Buttons[TEXT("Statistics")]
+			->Set(FString::Printf(TEXT("Score %3.0f\tScore Per Minute %2.0f\tAccuracy %.2f\tCurrentStreak %3d"),
+				PilotState->Score, PilotState->Score / PilotState->SecondsPlayed * 60, PilotState->MissileHit / PilotState->MissileFired, PilotState->CurrentStreak), WhiteColor, WhiteColor)
+			->Set(ScreenX * 0.5, ScreenY * 0.95, MenuFont, FontScale * 40, FVector2D(38.4, 1.5) * FontSize * 40)
+			->Draw(this, UButton::Alignment::Center);
 		break;
 	case Mode::GameOver:
-		DrawText(TEXT("Wasted"), RedColor, ScreenX * 0.4, ScreenY * 0.4, WastedFont, FontScale * 110);
-		Buttons[TEXT("Exit Game")]->Set(ScreenX * 0.9, ScreenY * 0.95, MenuFont, FontScale * 40, FVector2D(6, 1.5) * FontSize * 60)->Draw(this);
+		Buttons[TEXT("Wasted")]->Set(ScreenX * 0.5, ScreenY * 0.5, WastedFont, FontScale * 110, FVector2D(4.6, 1.5) * FontSize * 110)->Draw(this, UButton::Alignment::Center);
+		Buttons[TEXT("Exit Game")]->Set(ScreenX, ScreenY, MenuFont, FontScale * 40, FVector2D(6, 1.5) * FontSize * 40)->Draw(this, UButton::Alignment::BottomRight);
 		break;
 	}
+
+	//RenderHitBoxes(Canvas->Canvas);
 }
 
 void AMainHUD::SetMode(Mode NewMode)
