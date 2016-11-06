@@ -16,6 +16,9 @@ class FLIGHTSIMULATORVR_API AMainHUD : public AHUD
 
 	UPROPERTY(Category = Volume, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UFont* MenuFont;
+
+	UPROPERTY(Category = Volume, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	class UFont* WastedFont;
 	
 public:
 	AMainHUD();

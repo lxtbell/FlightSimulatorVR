@@ -12,6 +12,7 @@
 #include "Targets.h"
 #include "TargetSphere.h"
 #include "PilotState.h"
+#include "MainHUD.h"
 
 
 AFlightSimulatorVRPawn::AFlightSimulatorVRPawn()
@@ -184,7 +185,12 @@ void AFlightSimulatorVRPawn::NotifyHit(class UPrimitiveComponent* MyComp, class 
 			Explosion->Activate();
 			RadialForce->FireImpulse();
 			ExplosionSound->Play();
+
 			CurrentStage = Stage::Exploded;
+
+			AHUD* HUD = GetWorld()->GetFirstPlayerController()->GetHUD();
+			if (HUD->IsA(AMainHUD::StaticClass()))
+				Cast<AMainHUD>(HUD)->SetMode(AMainHUD::Mode::GameOver);
 		}
 	}
 }

@@ -15,17 +15,19 @@ AMainHUD::AMainHUD()
 	{
 		ConstructorHelpers::FObjectFinderOptional<UTexture> MenuBackground;
 		ConstructorHelpers::FObjectFinderOptional<UFont> MenuFont;
+		ConstructorHelpers::FObjectFinderOptional<UFont> WastedFont;
 		FConstructorStatics() :
 			MenuBackground(TEXT("/Game/Interface/New_York_Ruins.New_York_Ruins")),
-			MenuFont(TEXT("/Game/Interface/OLDENGL.OLDENGL"))
+			MenuFont(TEXT("/Game/Interface/OLDENGL.OLDENGL")),
+			WastedFont(TEXT("/Game/Interface/pricedown_bl.pricedown_bl"))
 		{
 		}
 	};
 	static FConstructorStatics ConstructorStatics;
 
 	MenuBackground = ConstructorStatics.MenuBackground.Get();
-
 	MenuFont = ConstructorStatics.MenuFont.Get();
+	WastedFont = ConstructorStatics.WastedFont.Get();
 
 	Buttons.Add("Start Game", (new UButtonStartGame())->Set("Start Game", WhiteColor, RedColor));
 	Buttons.Add("Start With Tutorial", (new UButtonStartWithTutorial())->Set("Start With Tutorial", WhiteColor, RedColor));
@@ -76,6 +78,10 @@ void AMainHUD::PostRender()
 			DrawText(FString::Printf(TEXT("Score %.0f\tScore Per Minute %.0f\tAccuracy %.2f\tCurrentStreak %d"), 
 				PilotState->Score, PilotState->Score / PilotState->SecondsPlayed * 60, PilotState->MissileHit / PilotState->MissileFired, PilotState->CurrentStreak), 
 				WhiteColor, ScreenX * 0.2, ScreenY * 0.9, MenuFont, FontScale * 40);
+		break;
+	case Mode::GameOver:
+		DrawText(TEXT("Wasted"), RedColor, ScreenX * 0.4, ScreenY * 0.4, WastedFont, FontScale * 100);
+		break;
 	}
 }
 
@@ -86,6 +92,7 @@ void AMainHUD::SetMode(Mode NewMode)
 	switch (CurrentMode)
 	{
 	case Mode::MainMenu:
+	case Mode::GameOver:
 		GetOwningPlayerController()->bShowMouseCursor = true;
 		GetOwningPlayerController()->bEnableMouseOverEvents = true;
 		GetOwningPlayerController()->bEnableClickEvents = true;
