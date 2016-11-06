@@ -17,14 +17,17 @@ class FLIGHTSIMULATORVR_API AMissile : public AActor
 	class UParticleSystemComponent* Trail;
 
 	UPROPERTY(Category = Physics, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	class UAudioComponent* MissileSound;
+
+	UPROPERTY(Category = Physics, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UParticleSystemComponent* Explosion;
 
 	UPROPERTY(Category = Physics, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class URadialForceComponent* RadialForce;
 
 	UPROPERTY(Category = Physics, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	class UAudioComponent* MissileSound;
-	
+	class UAudioComponent* ExplosionSound;
+
 public:	
 	// Sets default values for this actor's properties
 	AMissile();

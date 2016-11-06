@@ -24,6 +24,10 @@ AMissile::AMissile()
 	Trail = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Trail0"));
 	Trail->SetupAttachment(Missile);
 
+	MissileSound = CreateDefaultSubobject<UAudioComponent>(TEXT("MissileSound0"));
+	MissileSound->SetupAttachment(Trail);
+	MissileSound->bAutoActivate = false;
+
 	Explosion = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Explosion0"));
 	Explosion->SetupAttachment(Missile);
 	Explosion->bAutoActivate = false;
@@ -34,9 +38,9 @@ AMissile::AMissile()
 	RadialForce->Radius = 2000.f;
 	RadialForce->DestructibleDamage = 2.f;
 
-	MissileSound = CreateDefaultSubobject<UAudioComponent>(TEXT("MissileSound0"));
-	MissileSound->SetupAttachment(Explosion);
-	MissileSound->bAutoActivate = false;
+	ExplosionSound = CreateDefaultSubobject<UAudioComponent>(TEXT("ExplosionSound0"));
+	ExplosionSound->SetupAttachment(Explosion);
+	ExplosionSound->bAutoActivate = false;
 
 	LockTime = 0.2f;
 	FlyTime = 30.f;
@@ -147,8 +151,10 @@ void AMissile::Explode()
 	Missile->SetVisibility(false);
 
 	Trail->Deactivate();
+	MissileSound->Stop();
 	Explosion->Activate();
 	RadialForce->FireImpulse();
+	ExplosionSound->Play();
 
 	CurrentStage = Stage::Exploded;
 	FTimerHandle BurnTimerHandle;
