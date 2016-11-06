@@ -11,7 +11,8 @@
 #include "Missile.h"
 #include "Targets.h"
 #include "TargetSphere.h"
-
+#include "PilotState.h"
+#include "MainHUD.h"
 
 
 AFlightSimulatorVRPawn::AFlightSimulatorVRPawn()
@@ -45,6 +46,8 @@ AFlightSimulatorVRPawn::AFlightSimulatorVRPawn()
 	RadialForce = CreateDefaultSubobject<URadialForceComponent>(TEXT("RadialForce0"));
 	RadialForce->SetupAttachment(Explosion);
 	RadialForce->bAutoActivate = false;
+	RadialForce->Radius = 500.f;
+	RadialForce->DestructibleDamage = 4.f;
 
 	ExplosionSound = CreateDefaultSubobject<UAudioComponent>(TEXT("ExplosionSound0"));
 	ExplosionSound->SetupAttachment(Explosion);
@@ -106,6 +109,14 @@ void AFlightSimulatorVRPawn::BeginPlay()
 	}
 	TotalMissiles = MissileLocations.Num();
 	CurrentMissile = 0;
+
+	PilotState = nullptr;
+	if (GetController()->IsA(APlayerController::StaticClass()))
+	{
+		APlayerState* PlayerState = Cast<APlayerController>(GetController())->PlayerState;
+		if (PlayerState->IsA(APilotState::StaticClass()))
+			PilotState = Cast<APilotState>(PlayerState);
+	}
 }
 
 void AFlightSimulatorVRPawn::Tick(float DeltaSeconds)
@@ -113,7 +124,7 @@ void AFlightSimulatorVRPawn::Tick(float DeltaSeconds)
 	// Call any parent class Tick implementation
 	Super::Tick(DeltaSeconds);
 
-	//if (rand() % 100 == 0)
+	//if (FMath::Rand() % 100 == 0)
 	//	UE_LOG(LogTemp, Warning, TEXT("AFlightSimulatorVRPawn::Tick [CurrentForwardSpeed = %.4f] [bExploded = %d] [GetActorLocation = %s] [GetActorRotation = %s]"), CurrentForwardSpeed, bExploded ? 1 : 0, *GetActorLocation().ToString(), *GetActorRotation().ToString());
 
 	if (CurrentStage == Stage::Flying)
@@ -176,7 +187,16 @@ void AFlightSimulatorVRPawn::NotifyHit(class UPrimitiveComponent* MyComp, class 
 			Explosion->Activate();
 			RadialForce->FireImpulse();
 			ExplosionSound->Play();
+
 			CurrentStage = Stage::Exploded;
+
+			AController* Controller = GetController();
+			if (Controller->IsA(APlayerController::StaticClass()))
+			{
+				AHUD* HUD = Cast<APlayerController>(Controller)->GetHUD();
+				if (HUD->IsA(AMainHUD::StaticClass()))
+					Cast<AMainHUD>(HUD)->SetMode(AMainHUD::Mode::GameOver);
+			}
 		}
 	}
 }
@@ -311,5 +331,8 @@ void AFlightSimulatorVRPawn::Fire()
 		Parameters.Template = MissileTemplate;
 
 	AMissile* NewActor = GetWorld()->SpawnActor<AMissile>(AMissile::StaticClass(), NewLocation, ActorRotation, Parameters);
-	NewActor->Activate(CurrentForwardSpeed, this);
+	NewActor->Activate(CurrentForwardSpeed, this, PilotState);
+
+	if (PilotState != nullptr)
+		PilotState->MissileFired += 1;
 }

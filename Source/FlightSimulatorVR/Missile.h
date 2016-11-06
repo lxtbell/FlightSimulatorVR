@@ -17,14 +17,17 @@ class FLIGHTSIMULATORVR_API AMissile : public AActor
 	class UParticleSystemComponent* Trail;
 
 	UPROPERTY(Category = Physics, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	class UAudioComponent* MissileSound;
+
+	UPROPERTY(Category = Physics, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UParticleSystemComponent* Explosion;
 
 	UPROPERTY(Category = Physics, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class URadialForceComponent* RadialForce;
 
 	UPROPERTY(Category = Physics, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	class UAudioComponent* MissileSound;
-	
+	class UAudioComponent* ExplosionSound;
+
 public:	
 	// Sets default values for this actor's properties
 	AMissile();
@@ -32,7 +35,7 @@ public:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	virtual void Activate(float LaunchSpeed = 0, class AActor* MissileLauncher = nullptr);
+	virtual void Activate(float LaunchSpeed = 0, class AActor* MissileLauncher = nullptr, class APilotState* LauncherPilotState = nullptr);
 
 	virtual void Unlock();
 	
@@ -78,6 +81,8 @@ private:
 	Stage CurrentStage;
 
 	class AActor* Launcher;
+
+	class APilotState* PilotState;
 
 public:
 	FORCEINLINE class AActor* GetLauncher() const { return Launcher; }
