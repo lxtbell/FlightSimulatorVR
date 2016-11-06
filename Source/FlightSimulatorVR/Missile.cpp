@@ -32,7 +32,7 @@ AMissile::AMissile()
 	RadialForce->SetupAttachment(Explosion);
 	RadialForce->bAutoActivate = false;
 	RadialForce->Radius = 2000.f;
-	RadialForce->DestructibleDamage = 200.f;
+	RadialForce->DestructibleDamage = 2.f;
 
 	MissileSound = CreateDefaultSubobject<UAudioComponent>(TEXT("MissileSound0"));
 	MissileSound->SetupAttachment(Explosion);
@@ -84,7 +84,7 @@ void AMissile::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	//if (rand() % 100 == 0)
+	//if (FMath::Rand() % 100 == 0)
 	//	UE_LOG(LogTemp, Warning, TEXT("AMissile::Tick [CurrentForwardSpeed = %.4f] [Stage = %d] [GetActorLocation = %s] [GetActorRotation = %s]"), CurrentForwardSpeed, (int32)CurrentStage, *GetActorLocation().ToString(), *GetActorRotation().ToString());
 
 	if (CurrentStage == Stage::Activated || CurrentStage == Stage::Unlocked)

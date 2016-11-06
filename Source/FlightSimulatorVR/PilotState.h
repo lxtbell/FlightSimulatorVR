@@ -12,8 +12,24 @@ UCLASS()
 class FLIGHTSIMULATORVR_API APilotState : public APlayerState
 {
 	GENERATED_BODY()
-	
-	
-	
-	
+
+	UPROPERTY(Category = Streak, EditAnywhere)
+	float StreakTime;
+
+public:
+	APilotState();
+
+	virtual void Tick(float DeltaSeconds) override;
+
+	float Score;
+
+	float SecondsPlayed;
+
+	float MissileFired;
+
+	float MissileHit;
+
+	int32 CurrentStreak;
+
+	float CurrentStreakTime;
 };

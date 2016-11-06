@@ -52,4 +52,6 @@ private:
 	ATargetSphere* SphereTemplate;
 	TArray<SphereInfo> Spheres;
 	TQueue<SphereInfo*> FracturedSpheres;
+
+	class APilotState* PilotState;
 };

@@ -11,7 +11,7 @@
 #include "Missile.h"
 #include "Targets.h"
 #include "TargetSphere.h"
-
+#include "PilotState.h"
 
 
 AFlightSimulatorVRPawn::AFlightSimulatorVRPawn()
@@ -45,6 +45,8 @@ AFlightSimulatorVRPawn::AFlightSimulatorVRPawn()
 	RadialForce = CreateDefaultSubobject<URadialForceComponent>(TEXT("RadialForce0"));
 	RadialForce->SetupAttachment(Explosion);
 	RadialForce->bAutoActivate = false;
+	RadialForce->Radius = 500.f;
+	RadialForce->DestructibleDamage = 4.f;
 
 	ExplosionSound = CreateDefaultSubobject<UAudioComponent>(TEXT("ExplosionSound0"));
 	ExplosionSound->SetupAttachment(Explosion);
@@ -106,6 +108,12 @@ void AFlightSimulatorVRPawn::BeginPlay()
 	}
 	TotalMissiles = MissileLocations.Num();
 	CurrentMissile = 0;
+
+	APlayerState* PlayerState = GetWorld()->GetFirstPlayerController()->PlayerState;
+	if (PlayerState->IsA(APilotState::StaticClass()))
+		PilotState = Cast<APilotState>(PlayerState);
+	else
+		PilotState = nullptr;
 }
 
 void AFlightSimulatorVRPawn::Tick(float DeltaSeconds)
@@ -113,7 +121,7 @@ void AFlightSimulatorVRPawn::Tick(float DeltaSeconds)
 	// Call any parent class Tick implementation
 	Super::Tick(DeltaSeconds);
 
-	//if (rand() % 100 == 0)
+	//if (FMath::Rand() % 100 == 0)
 	//	UE_LOG(LogTemp, Warning, TEXT("AFlightSimulatorVRPawn::Tick [CurrentForwardSpeed = %.4f] [bExploded = %d] [GetActorLocation = %s] [GetActorRotation = %s]"), CurrentForwardSpeed, bExploded ? 1 : 0, *GetActorLocation().ToString(), *GetActorRotation().ToString());
 
 	if (CurrentStage == Stage::Flying)
@@ -312,4 +320,7 @@ void AFlightSimulatorVRPawn::Fire()
 
 	AMissile* NewActor = GetWorld()->SpawnActor<AMissile>(AMissile::StaticClass(), NewLocation, ActorRotation, Parameters);
 	NewActor->Activate(CurrentForwardSpeed, this);
+
+	if (PilotState != nullptr)
+		PilotState->MissileFired += 1;
 }
