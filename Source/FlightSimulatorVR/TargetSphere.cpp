@@ -15,6 +15,10 @@ ATargetSphere::ATargetSphere()
 	Sphere->SetVisibility(false);
 	RootComponent = Sphere;
 
+	ExplosionSound = CreateDefaultSubobject<UAudioComponent>(TEXT("ExplosionSound0"));
+	ExplosionSound->SetupAttachment(Sphere);
+	ExplosionSound->bAutoActivate = false;
+
 	SelfDestructionDamage = 25000.f;
 	SelfDestructionRadius = 5000.f;
 	SelfDestructionImpulse = 0.f;
@@ -30,6 +34,6 @@ void ATargetSphere::Activate()
 void ATargetSphere::Explode(const FVector & Location)
 {
 	bExploded = true;
-
+	ExplosionSound->Play();
 	Sphere->ApplyRadiusDamage(SelfDestructionDamage, Location, SelfDestructionRadius, SelfDestructionImpulse, true);
 }

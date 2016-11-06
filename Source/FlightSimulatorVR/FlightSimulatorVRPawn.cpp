@@ -6,10 +6,12 @@
 #include "PhysicsEngine/DestructibleActor.h"
 #include "Components/DestructibleComponent.h"
 #include "Components/ChildActorComponent.h"
+#include "Components/AudioComponent.h"
 #include "Public/EngineUtils.h"
 #include "Missile.h"
 #include "Targets.h"
 #include "TargetSphere.h"
+
 
 
 AFlightSimulatorVRPawn::AFlightSimulatorVRPawn()
@@ -57,6 +59,12 @@ AFlightSimulatorVRPawn::AFlightSimulatorVRPawn()
 	RadialForce->SetupAttachment(Explosion);
 	RadialForce->bAutoActivate = false;
 
+	ExplosionSound = CreateDefaultSubobject<UAudioComponent>(TEXT("ExplosionSound0"));
+	ExplosionSound->SetupAttachment(Explosion);
+	ExplosionSound->bAutoActivate = false;
+
+
+
 	//Missile = CreateDefaultSubobject<UChildActorComponent>(TEXT("Missile0"));
 	//Missile->SetupAttachment(Plane);
 	//Missile->SetChildActorClass(AMissile::StaticClass());
@@ -81,10 +89,10 @@ AFlightSimulatorVRPawn::AFlightSimulatorVRPawn()
 	SelfDestructionImpulse = 0.f;
 }
 
+
 void AFlightSimulatorVRPawn::BeginPlay()
 {
 	Super::BeginPlay();
-
 	UE_LOG(LogTemp, Warning, TEXT("AFlightSimulatorVRPawn::BeginPlay"));
 
 	ThrottleA = NaturalSpeed;
@@ -177,7 +185,7 @@ void AFlightSimulatorVRPawn::NotifyHit(class UPrimitiveComponent* MyComp, class 
 
 			Explosion->Activate();
 			RadialForce->FireImpulse();
-
+			ExplosionSound->Play();
 			bExploded = true;
 		}
 	}
