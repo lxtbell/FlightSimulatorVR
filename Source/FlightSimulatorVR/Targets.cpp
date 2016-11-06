@@ -11,6 +11,7 @@
 #include "Components/DestructibleComponent.h"
 #include "TargetSphere.h"
 #include "PilotState.h"
+#include "FlightSimulatorVRPawn.h"
 
 
 // Sets default values
@@ -66,7 +67,7 @@ void ATargets::BeginPlay()
 	}
 }
 
-void ATargets::OnTargetHit(AActor* Target, const FVector & Location, class APilotState* PilotState)
+void ATargets::OnTargetHit(AActor* Target, const FVector & Location, class AFlightSimulatorVRPawn* Pawn)
 {
 	UE_LOG(LogTemp, Warning, TEXT("ATargets::OnTargetHit %s"), *Target->GetName());
 
@@ -79,6 +80,7 @@ void ATargets::OnTargetHit(AActor* Target, const FVector & Location, class APilo
 			FTimerHandle DestroyTimerHandle;
 			GetWorldTimerManager().SetTimer(DestroyTimerHandle, this, &ATargets::Rebuild, RebuildTime, false);
 
+			APilotState* PilotState = Pawn->GetPilotState();
 			if (PilotState != nullptr)
 			{
 				PilotState->Score += 1;
@@ -86,6 +88,8 @@ void ATargets::OnTargetHit(AActor* Target, const FVector & Location, class APilo
 
 				PilotState->CurrentStreak += 1;
 				PilotState->CurrentStreakTime = 0;
+
+				Pawn->PlayStreakSound(PilotState->CurrentStreak);
 			}
 
 			break;

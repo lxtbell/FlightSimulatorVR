@@ -5,6 +5,8 @@
 
 #include "EngineMinimal.h"
 
+#include "Sound/SoundCue.h"
+
 DECLARE_LOG_CATEGORY_EXTERN(LogFlying, Log, All);
 
 #endif

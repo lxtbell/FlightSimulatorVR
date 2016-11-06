@@ -53,12 +53,9 @@ AFlightSimulatorVRPawn::AFlightSimulatorVRPawn()
 	ExplosionSound->SetupAttachment(Explosion);
 	ExplosionSound->bAutoActivate = false;
 
-
-
-	//Missile = CreateDefaultSubobject<UChildActorComponent>(TEXT("Missile0"));
-	//Missile->SetupAttachment(Plane);
-	//Missile->SetChildActorClass(AMissile::StaticClass());
-	//Missile->CreateChildActor();
+	StreakSound = CreateDefaultSubobject<UAudioComponent>(TEXT("StreakSound0"));
+	StreakSound->SetupAttachment(Plane);
+	StreakSound->bAutoActivate = false;
 
 	// Set handling parameters
 	MaxSpeed = 4000.f;
@@ -160,15 +157,8 @@ void AFlightSimulatorVRPawn::NotifyHit(class UPrimitiveComponent* MyComp, class 
 		bool bExplode = true;
 
 		if (Other->IsA(AMissile::StaticClass()))
-		{
-			AActor* Launcher = Cast<AMissile>(Other)->GetLauncher();
-			if (Launcher != nullptr && Launcher->IsA(AFlightSimulatorVRPawn::StaticClass()))
-			{
-				AFlightSimulatorVRPawn* OwnerPawn = Cast<AFlightSimulatorVRPawn>(Launcher);
-				if (OwnerPawn == this)
-					bExplode = false;
-			}
-		}
+			if (Cast<AMissile>(Other)->GetLauncher() == this)
+				bExplode = false;
 
 		if (Other->IsA(ATargetSphere::StaticClass()))
 		{
@@ -218,6 +208,18 @@ void AFlightSimulatorVRPawn::StartFlying()
 	CurrentStage = Stage::Flying;
 	
 	Plane->SetVisibility(true);
+}
+
+void AFlightSimulatorVRPawn::PlayStreakSound(int32 Streak)
+{
+	Streak = FMath::Min(Streak, StreakSounds.Num());
+
+	if (Streak <= 0)
+		return;
+
+	StreakSound->Stop();
+	StreakSound->Sound = StreakSounds[Streak - 1];
+	StreakSound->Play();
 }
 
 void AFlightSimulatorVRPawn::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
@@ -331,7 +333,7 @@ void AFlightSimulatorVRPawn::Fire()
 		Parameters.Template = MissileTemplate;
 
 	AMissile* NewActor = GetWorld()->SpawnActor<AMissile>(AMissile::StaticClass(), NewLocation, ActorRotation, Parameters);
-	NewActor->Activate(CurrentForwardSpeed, this, PilotState);
+	NewActor->Activate(CurrentForwardSpeed, this);
 
 	if (PilotState != nullptr)
 		PilotState->MissileFired += 1;

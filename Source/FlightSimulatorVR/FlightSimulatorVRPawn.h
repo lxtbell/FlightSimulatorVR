@@ -3,6 +3,7 @@
 #include "GameFramework/Pawn.h"
 #include "FlightSimulatorVRPawn.generated.h"
 
+
 UCLASS(config=Game)
 class AFlightSimulatorVRPawn : public APawn
 {
@@ -32,10 +33,8 @@ class AFlightSimulatorVRPawn : public APawn
 	UPROPERTY(Category = Physics, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UAudioComponent* ExplosionSound;
 
-
-
-	//UPROPERTY(Category = Missile, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	//class UChildActorComponent* Missile;
+	UPROPERTY(Category = Physics, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	class UAudioComponent* StreakSound;
 
 public:
 	AFlightSimulatorVRPawn();
@@ -48,6 +47,7 @@ public:
 	// End AActor overrides
 
 	virtual void StartFlying();
+	virtual void PlayStreakSound(int32 Streak);
 
 protected:
 	// Begin APawn overrides
@@ -111,6 +111,9 @@ private:
 	UPROPERTY(Category = Misc, EditAnywhere)
 	float SelfDestructionImpulse;
 
+	UPROPERTY(Category = Sound, EditAnywhere)
+	TArray<USoundCue*> StreakSounds;
+
 	/** Throttle interpolation */
 
 	float ThrottleA;
@@ -147,10 +150,5 @@ private:
 	class APilotState* PilotState;
 
 public:
-	/** Returns PlaneMesh subobject **/
-	//FORCEINLINE class UStaticMeshComponent* GetPlaneMesh() const { return PlaneMesh; }
-	/** Returns SpringArm subobject **/
-	//FORCEINLINE class USpringArmComponent* GetSpringArm() const { return SpringArm; }
-	/** Returns Camera subobject **/
-	//FORCEINLINE class UCameraComponent* GetCamera() const { return Camera; }
+	FORCEINLINE class APilotState* GetPilotState() const { return PilotState; }
 };
