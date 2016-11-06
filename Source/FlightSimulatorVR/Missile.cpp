@@ -9,6 +9,7 @@
 #include "Engine/DestructibleMesh.h"
 #include "Targets.h"
 #include "TargetSphere.h"
+#include "FlightSimulatorVRPawn.h"
 
 
 // Sets default values
@@ -60,7 +61,7 @@ void AMissile::BeginPlay()
 	CurrentForwardSpeed = InitialSpeed;
 }
 
-void AMissile::Activate(float LaunchSpeed, class AActor* MissileLauncher, class APilotState* LauncherPilotState)
+void AMissile::Activate(float LaunchSpeed, class AFlightSimulatorVRPawn* MissileLauncher)
 {
 	if (CurrentStage != Stage::Created)
 		return;
@@ -79,7 +80,6 @@ void AMissile::Activate(float LaunchSpeed, class AActor* MissileLauncher, class 
 	GetWorldTimerManager().SetTimer(SelfDestoryTimerHandle, this, &AMissile::Explode, FlyTime);
 
 	Launcher = MissileLauncher;
-	PilotState = LauncherPilotState;
 
 	//UE_LOG(LogTemp, Warning, TEXT("AMissile::Activate %.4f"), CurrentForwardSpeed);
 }
@@ -125,7 +125,7 @@ void AMissile::NotifyHit(class UPrimitiveComponent* MyComp, class AActor* Other,
 		{
 			AActor* OtherOwner = Other->GetOwner();
 			if (OtherOwner && OtherOwner->IsA(ATargets::StaticClass()))
-				Cast<ATargets>(OtherOwner)->OnTargetHit(Other, HitLocation, PilotState);
+				Cast<ATargets>(OtherOwner)->OnTargetHit(Other, HitLocation, Launcher);
 		}
 			
 		Explode();
