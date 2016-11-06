@@ -10,6 +10,7 @@
 #include "Components/ActorComponent.h"
 #include "Components/DestructibleComponent.h"
 #include "TargetSphere.h"
+#include "PilotState.h"
 
 
 // Sets default values
@@ -65,7 +66,7 @@ void ATargets::BeginPlay()
 	}
 }
 
-void ATargets::OnTargetHit(AActor* Target, const FVector & Location)
+void ATargets::OnTargetHit(AActor* Target, const FVector & Location, class APilotState* PilotState)
 {
 	UE_LOG(LogTemp, Warning, TEXT("ATargets::OnTargetHit %s"), *Target->GetName());
 
@@ -77,6 +78,15 @@ void ATargets::OnTargetHit(AActor* Target, const FVector & Location)
 			FracturedSpheres.Enqueue(&Info);
 			FTimerHandle DestroyTimerHandle;
 			GetWorldTimerManager().SetTimer(DestroyTimerHandle, this, &ATargets::Rebuild, RebuildTime, false);
+
+			if (PilotState != nullptr)
+			{
+				PilotState->Score += 1;
+				PilotState->MissileHit += 1;
+
+				PilotState->CurrentStreak += 1;
+				PilotState->CurrentStreakTime = 0;
+			}
 
 			break;
 		}

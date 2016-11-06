@@ -144,6 +144,8 @@ private:
 	};
 	Stage CurrentStage;
 
+	class APilotState* PilotState;
+
 public:
 	/** Returns PlaneMesh subobject **/
 	//FORCEINLINE class UStaticMeshComponent* GetPlaneMesh() const { return PlaneMesh; }

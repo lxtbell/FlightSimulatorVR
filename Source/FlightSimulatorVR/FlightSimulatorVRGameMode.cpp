@@ -4,6 +4,8 @@
 #include "FlightSimulatorVRGameMode.h"
 #include "FlightSimulatorVRPawn.h"
 #include "MainHUD.h"
+#include "PilotState.h"
+
 
 AFlightSimulatorVRGameMode::AFlightSimulatorVRGameMode()
 {
@@ -11,4 +13,6 @@ AFlightSimulatorVRGameMode::AFlightSimulatorVRGameMode()
 	DefaultPawnClass = AFlightSimulatorVRPawn::StaticClass();
 
 	HUDClass = AMainHUD::StaticClass();
+
+	PlayerStateClass = APilotState::StaticClass();
 }

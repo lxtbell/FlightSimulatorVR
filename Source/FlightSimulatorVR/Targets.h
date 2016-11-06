@@ -21,7 +21,7 @@ public:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	virtual void OnTargetHit(AActor* Target, const FVector & Location);
+	virtual void OnTargetHit(AActor* Target, const FVector & Location, class APilotState* PilotState);
 
 protected:
 	virtual class ATargetSphere* SpawnSphere(const FVector & Location, const FRotator & Rotation);

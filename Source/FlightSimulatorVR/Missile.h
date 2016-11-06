@@ -32,7 +32,7 @@ public:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	virtual void Activate(float LaunchSpeed = 0, class AActor* MissileLauncher = nullptr);
+	virtual void Activate(float LaunchSpeed = 0, class AActor* MissileLauncher = nullptr, class APilotState* LauncherPilotState = nullptr);
 
 	virtual void Unlock();
 	
@@ -78,6 +78,8 @@ private:
 	Stage CurrentStage;
 
 	class AActor* Launcher;
+
+	class APilotState* PilotState;
 
 public:
 	FORCEINLINE class AActor* GetLauncher() const { return Launcher; }
