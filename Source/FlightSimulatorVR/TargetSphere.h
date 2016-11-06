@@ -13,6 +13,9 @@ class FLIGHTSIMULATORVR_API ATargetSphere : public AActor
 	UPROPERTY(Category = Sphere, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UDestructibleComponent* Sphere;
 
+	UPROPERTY(Category = Physics, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	class UAudioComponent* ExplosionSound;
+
 public:	
 	// Sets default values for this actor's properties
 	ATargetSphere();

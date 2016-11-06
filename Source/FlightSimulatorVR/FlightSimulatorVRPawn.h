@@ -29,6 +29,11 @@ class AFlightSimulatorVRPawn : public APawn
 	UPROPERTY(Category = Physics, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class URadialForceComponent* RadialForce;
 
+	UPROPERTY(Category = Physics, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	class UAudioComponent* ExplosionSound;
+
+
+
 	//UPROPERTY(Category = Missile, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	//class UChildActorComponent* Missile;
 
@@ -105,6 +110,7 @@ private:
 	float SelfDestructionImpulse;
 
 	/** Throttle interpolation */
+
 	float ThrottleA;
 	float ThrottleB;
 	float ThrottleC;

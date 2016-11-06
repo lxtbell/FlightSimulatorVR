@@ -5,6 +5,7 @@
 #include "PhysicsEngine/RadialForceComponent.h"
 #include "PhysicsEngine/DestructibleActor.h"
 #include "Components/StaticMeshComponent.h"
+#include "Components/AudioComponent.h"
 #include "Engine/DestructibleMesh.h"
 #include "Targets.h"
 #include "TargetSphere.h"
@@ -44,6 +45,10 @@ AMissile::AMissile()
 	RadialForce->Radius = 2000.f;
 	RadialForce->DestructibleDamage = 200.f;
 
+	MissileSound = CreateDefaultSubobject<UAudioComponent>(TEXT("MissileSound0"));
+	MissileSound->SetupAttachment(Explosion);
+	MissileSound->bAutoActivate = false;
+
 	LockTime = 0.2f;
 	FlyTime = 30.f;
 	BurnTime = 10.0f;
@@ -68,6 +73,8 @@ void AMissile::Activate(float LaunchSpeed, class AActor* MissileLauncher)
 		return;
 
 	Missile->SetVisibility(true);
+
+	MissileSound->Play();
 
 	CurrentForwardSpeed += LaunchSpeed;
 	CurrentStage = Stage::Activated;

@@ -21,6 +21,9 @@ class FLIGHTSIMULATORVR_API AMissile : public AActor
 
 	UPROPERTY(Category = Physics, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class URadialForceComponent* RadialForce;
+
+	UPROPERTY(Category = Physics, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	class UAudioComponent* MissileSound;
 	
 public:	
 	// Sets default values for this actor's properties
