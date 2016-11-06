@@ -17,17 +17,6 @@ AMissile::AMissile()
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	// Structure to hold one-time initialization
-	//struct FConstructorStatics
-	//{
-	//	ConstructorHelpers::FObjectFinderOptional<UDestructibleMesh> Missile;
-	//	FConstructorStatics()
-	//		: Missile(TEXT("/Game/Geometry/Meshes/AIM120DMissile/AIM120D_DM.AIM120D_DM"))
-	//	{
-	//	}
-	//};
-	//static FConstructorStatics ConstructorStatics;
-
 	Missile = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Missile0"));
 	Missile->SetCollisionProfileName(TEXT("OverlapAll"));
 	RootComponent = Missile;
@@ -55,6 +44,8 @@ AMissile::AMissile()
 	InitialSpeed = 50.f;
 	MaxSpeed = 6000.f;
 	Acceleration = 0.01f;
+
+	CurrentStage = Stage::Created;
 }
 
 // Called when the game starts or when spawned
@@ -63,8 +54,6 @@ void AMissile::BeginPlay()
 	Super::BeginPlay();
 
 	CurrentForwardSpeed = InitialSpeed;
-
-	CurrentStage = Stage::Created;
 }
 
 void AMissile::Activate(float LaunchSpeed, class AActor* MissileLauncher)
