@@ -73,6 +73,7 @@ AFlightSimulatorVRPawn::AFlightSimulatorVRPawn()
 	MissileLocations.Add(FVector(0));
 
 	ExplodedCameraDistance = 800.f;
+	ExplodedCameraSpeed = 10.f;
 	ExplodedTimeDilation = 0.2f;
 	SelfDestructionDamage = 25000.f;
 	SelfDestructionRadius = 200.f;
@@ -157,7 +158,7 @@ void AFlightSimulatorVRPawn::Tick(float DeltaSeconds)
 	}
 	else if (CurrentStage == Stage::Exploded)
 	{
-		SpringArm->TargetArmLength = FMath::FInterpTo(SpringArm->TargetArmLength, ExplodedCameraDistance, GetWorld()->GetDeltaSeconds(), 2.f);
+		SpringArm->TargetArmLength = FMath::FInterpTo(SpringArm->TargetArmLength, ExplodedCameraDistance, GetWorld()->GetDeltaSeconds(), ExplodedCameraSpeed);
 	}
 }
 
