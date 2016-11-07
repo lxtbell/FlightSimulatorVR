@@ -14,6 +14,8 @@
 #include "PilotState.h"
 #include "MainHUD.h"
 
+#include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
+
 
 AFlightSimulatorVRPawn::AFlightSimulatorVRPawn()
 {
@@ -71,6 +73,7 @@ AFlightSimulatorVRPawn::AFlightSimulatorVRPawn()
 	MissileLocations.Add(FVector(0));
 
 	ExplodedCameraDistance = 800.f;
+	ExplodedTimeDilation = 0.2f;
 	SelfDestructionDamage = 25000.f;
 	SelfDestructionRadius = 200.f;
 	SelfDestructionImpulse = 0.f;
@@ -110,7 +113,12 @@ void AFlightSimulatorVRPawn::BeginPlay()
 	PilotState = nullptr;
 	if (GetController()->IsA(APlayerController::StaticClass()))
 	{
+		APlayerController* PlayerController = Cast<APlayerController>(GetController());
 		APlayerState* PlayerState = Cast<APlayerController>(GetController())->PlayerState;
+		if (PlayerController->GetHUD()->IsA(AMainHUD::StaticClass()))
+		{
+			((AMainHUD*)PlayerController->GetHUD())->SetMode(AMainHUD::Mode::InGame);
+		}
 		if (PlayerState->IsA(APilotState::StaticClass()))
 			PilotState = Cast<APilotState>(PlayerState);
 	}
@@ -177,7 +185,8 @@ void AFlightSimulatorVRPawn::NotifyHit(class UPrimitiveComponent* MyComp, class 
 			Explosion->Activate();
 			RadialForce->FireImpulse();
 			ExplosionSound->Play();
-
+			UGameplayStatics::SetGlobalTimeDilation(GetWorld(), ExplodedTimeDilation);
+			
 			CurrentStage = Stage::Exploded;
 
 			AController* Controller = GetController();
