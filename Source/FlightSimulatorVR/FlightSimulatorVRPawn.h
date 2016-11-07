@@ -103,6 +103,9 @@ private:
 	float ExplodedCameraDistance;
 
 	UPROPERTY(Category = Misc, EditAnywhere)
+	float ExplodedTimeDilation;
+
+	UPROPERTY(Category = Misc, EditAnywhere)
 	float SelfDestructionDamage;
 
 	UPROPERTY(Category = Misc, EditAnywhere)
