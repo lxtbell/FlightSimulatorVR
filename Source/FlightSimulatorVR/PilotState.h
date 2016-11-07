@@ -32,4 +32,8 @@ public:
 	int32 CurrentStreak;
 
 	float CurrentStreakTime;
+
+	virtual float GetScorePerMinute();
+
+	virtual float GetAccuracy();
 };

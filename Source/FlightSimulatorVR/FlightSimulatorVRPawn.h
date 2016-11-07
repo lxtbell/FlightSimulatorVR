@@ -150,6 +150,8 @@ private:
 	};
 	Stage CurrentStage;
 
+	class AMainHUD* MainHUD;
+
 	class APilotState* PilotState;
 
 public:

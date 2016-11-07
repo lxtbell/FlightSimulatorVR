@@ -78,11 +78,13 @@ void AMainHUD::PostRender()
 	case Mode::InGameTutorial:
 	case Mode::InGame:
 		if (PilotState != nullptr)
+		{
 			Buttons[TEXT("Statistics")]
-			->Set(FString::Printf(TEXT("Score %3.0f\tScore Per Minute %2.0f\tAccuracy %.2f\tCurrentStreak %3d"),
-				PilotState->Score, PilotState->Score / PilotState->SecondsPlayed * 60, PilotState->MissileHit / PilotState->MissileFired, PilotState->CurrentStreak), WhiteColor, WhiteColor)
-			->Set(ScreenX * 0.5, ScreenY * 0.95, MenuFont, FontScale * 40, FVector2D(38.4, 1.5) * FontSize * 40)
-			->Draw(this, UButton::Alignment::Center);
+				->Set(FString::Printf(TEXT("Score %3.0f\tScore Per Minute %2.0f\tAccuracy %.2f\tCurrentStreak %3d"),
+					PilotState->Score, PilotState->GetScorePerMinute(), PilotState->GetAccuracy(), PilotState->CurrentStreak), WhiteColor, WhiteColor)
+				->Set(ScreenX * 0.5, ScreenY * 0.95, MenuFont, FontScale * 40, FVector2D(38.4, 1.5) * FontSize * 40)
+				->Draw(this, UButton::Alignment::Center);
+		}
 		break;
 	case Mode::GameOver:
 		Buttons[TEXT("Wasted")]->Set(ScreenX * 0.5, ScreenY * 0.5, WastedFont, FontScale * 110, FVector2D(4.6, 1.5) * FontSize * 110)->Draw(this, UButton::Alignment::Center);

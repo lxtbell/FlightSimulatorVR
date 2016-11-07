@@ -30,3 +30,13 @@ void APilotState::Tick(float DeltaSeconds)
 		CurrentStreakTime = 0.f;
 	}
 }
+
+float APilotState::GetScorePerMinute()
+{
+	return (SecondsPlayed == 0) ? 0 : (Score / SecondsPlayed * 60);
+}
+
+float APilotState::GetAccuracy()
+{
+	return (MissileFired == 0) ? 1 : (MissileHit / MissileFired);
+}
