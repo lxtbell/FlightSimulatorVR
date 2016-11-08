@@ -120,6 +120,9 @@ private:
 	UPROPERTY(Category = Sound, EditAnywhere)
 	TArray<USoundCue*> StreakSounds;
 
+	UPROPERTY(Category = Misc, EditAnywhere)
+	FPostProcessSettings ExplodedLenseSetting;
+
 	/** Throttle interpolation */
 
 	float ThrottleA;

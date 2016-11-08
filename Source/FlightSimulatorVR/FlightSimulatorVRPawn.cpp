@@ -15,6 +15,7 @@
 #include "MainHUD.h"
 
 #include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
+#include "Runtime/Engine/Classes/Engine/Scene.h"
 
 
 AFlightSimulatorVRPawn::AFlightSimulatorVRPawn()
@@ -78,6 +79,8 @@ AFlightSimulatorVRPawn::AFlightSimulatorVRPawn()
 	SelfDestructionDamage = 25000.f;
 	SelfDestructionRadius = 200.f;
 	SelfDestructionImpulse = 0.f;
+
+	ExplodedLenseSetting = FPostProcessSettings();
 
 	CurrentStage = Stage::Created;
 
@@ -195,6 +198,8 @@ void AFlightSimulatorVRPawn::NotifyHit(class UPrimitiveComponent* MyComp, class 
 			ExplosionSound->Play();
 			UGameplayStatics::SetGlobalTimeDilation(GetWorld(), ExplodedTimeDilation);
 			
+			Camera->PostProcessSettings = ExplodedLenseSetting;
+
 			CurrentStage = Stage::Exploded;
 
 			AController* Controller = GetController();
