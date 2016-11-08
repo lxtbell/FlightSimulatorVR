@@ -103,6 +103,9 @@ private:
 	float ExplodedCameraDistance;
 
 	UPROPERTY(Category = Misc, EditAnywhere)
+	float ExplodedCameraSpeed;
+
+	UPROPERTY(Category = Misc, EditAnywhere)
 	float ExplodedTimeDilation;
 
 	UPROPERTY(Category = Misc, EditAnywhere)
