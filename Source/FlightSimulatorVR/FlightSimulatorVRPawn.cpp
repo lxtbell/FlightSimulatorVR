@@ -107,12 +107,12 @@ void AFlightSimulatorVRPawn::BeginPlay()
 	CurrentMissile = 0;
 
 	MainHUD = nullptr;
-	if (Controller->IsA(APlayerController::StaticClass()))
+	if (Controller && Controller->IsA(APlayerController::StaticClass()))
 	{
 		APlayerController* PlayerController = Cast<APlayerController>(Controller);
 		
 		AHUD* HUD = PlayerController->GetHUD();
-		if (HUD->IsA(AMainHUD::StaticClass()))
+		if (HUD && HUD->IsA(AMainHUD::StaticClass()))
 		{
 			MainHUD = Cast<AMainHUD>(HUD);
 			MainHUD->SetMode(AMainHUD::Mode::InGame);
@@ -120,7 +120,7 @@ void AFlightSimulatorVRPawn::BeginPlay()
 	}
 
 	PilotState = nullptr;
-	if (PlayerState->IsA(APilotState::StaticClass()))
+	if (PlayerState && PlayerState->IsA(APilotState::StaticClass()))
 	{
 		PilotState = Cast<APilotState>(PlayerState);
 	}

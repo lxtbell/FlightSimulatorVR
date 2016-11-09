@@ -46,11 +46,13 @@ void AMainHUD::BeginPlay()
 	
 	SetMode(Mode::MainMenu);
 
-	APlayerState* PlayerState = GetOwningPlayerController()->PlayerState;
-	if (PlayerState->IsA(APilotState::StaticClass()))
-		PilotState = Cast<APilotState>(PlayerState);
-	else
-		PilotState = nullptr;
+	PilotState = nullptr;
+	if (PlayerOwner)
+	{
+		APlayerState* PlayerState = PlayerOwner->PlayerState;
+		if (PlayerState && PlayerState->IsA(APilotState::StaticClass()))
+			PilotState = Cast<APilotState>(PlayerState);
+	}
 }
 
 void AMainHUD::PostRender()
