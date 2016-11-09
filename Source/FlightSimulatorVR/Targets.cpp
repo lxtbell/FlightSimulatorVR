@@ -12,27 +12,13 @@
 #include "TargetSphere.h"
 #include "PilotState.h"
 #include "FlightSimulatorVRPawn.h"
+#include "ResourceGuy.h"
 
 
 // Sets default values
 ATargets::ATargets()
 {
-	// Structure to hold one-time initialization
-	struct FConstructorStatics
-	{
-		ConstructorHelpers::FObjectFinderOptional<UStaticMesh> Cube;
-		ConstructorHelpers::FObjectFinderOptional<UMaterial> Glass;
-		FConstructorStatics() :
-			Cube(TEXT("/Engine/BasicShapes/Cube.Cube")),
-			Glass(TEXT("/Game/StarterContent/Materials/M_Glass.M_Glass"))
-		{
-		}
-	};
-	static FConstructorStatics ConstructorStatics;
-
 	Cube = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Cube0"));
-	Cube->SetStaticMesh(ConstructorStatics.Cube.Get());
-	Cube->SetMaterial(0, ConstructorStatics.Glass.Get());
 	Cube->bHiddenInGame = true;
 	Cube->SetCollisionProfileName(TEXT("OverlapAll"));
 	RootComponent = Cube;
