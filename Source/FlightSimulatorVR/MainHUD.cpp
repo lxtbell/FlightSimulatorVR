@@ -6,29 +6,11 @@
 #include "FlightSimulatorVRPawn.h"
 #include "Engine/Canvas.h"
 #include "PilotState.h"
+#include "ResourceGuy.h"
 
 
 AMainHUD::AMainHUD()
 {
-	// Structure to hold one-time initialization
-	struct FConstructorStatics
-	{
-		ConstructorHelpers::FObjectFinderOptional<UTexture> MenuBackground;
-		ConstructorHelpers::FObjectFinderOptional<UFont> MenuFont;
-		ConstructorHelpers::FObjectFinderOptional<UFont> WastedFont;
-		FConstructorStatics() :
-			MenuBackground(TEXT("/Game/Interface/New_York_Ruins.New_York_Ruins")),
-			MenuFont(TEXT("/Game/Interface/OLDENGL.OLDENGL")),
-			WastedFont(TEXT("/Game/Interface/pricedown_bl.pricedown_bl"))
-		{
-		}
-	};
-	static FConstructorStatics ConstructorStatics;
-
-	MenuBackground = ConstructorStatics.MenuBackground.Get();
-	MenuFont = ConstructorStatics.MenuFont.Get();
-	WastedFont = ConstructorStatics.WastedFont.Get();
-
 	Buttons.Add(TEXT("Flight Simulator VR"), (new UButton())->Set(TEXT("Flight Simulator VR"), WhiteColor, RedColor));
 	Buttons.Add(TEXT("Start Game"), (new UButtonStartGame())->Set(TEXT("Start Game"), WhiteColor, RedColor));
 	Buttons.Add(TEXT("Start With Tutorial"), (new UButtonStartWithTutorial())->Set(TEXT("Start With Tutorial"), WhiteColor, RedColor));
@@ -52,6 +34,14 @@ void AMainHUD::BeginPlay()
 		APlayerState* PlayerState = PlayerOwner->PlayerState;
 		if (PlayerState && PlayerState->IsA(APilotState::StaticClass()))
 			PilotState = Cast<APilotState>(PlayerState);
+	}
+
+	AResourceGuy* ResourceGuy = GetFirstResourceGuy(GetWorld());
+	if (ResourceGuy != nullptr)
+	{
+		MenuBackground = ResourceGuy->AMainHUD_MenuBackground;
+		MenuFont = ResourceGuy->AMainHUD_MenuFont;
+		WastedFont = ResourceGuy->AMainHUD_WastedFont;
 	}
 }
 
