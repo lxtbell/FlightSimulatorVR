@@ -12,7 +12,8 @@ ATargetSphere::ATargetSphere()
 	//PrimaryActorTick.bCanEverTick = true;
 
 	Sphere = CreateDefaultSubobject<UDestructibleComponent>(TEXT("Sphere0"));
-	Sphere->SetVisibility(false);
+	//Sphere->SetVisibility(false);
+	//Sphere->SetCollisionProfileName(TEXT("OverlapAll"));
 	RootComponent = Sphere;
 
 	ExplosionSound = CreateDefaultSubobject<UAudioComponent>(TEXT("ExplosionSound0"));
@@ -28,7 +29,8 @@ ATargetSphere::ATargetSphere()
 
 void ATargetSphere::Activate()
 {
-	Sphere->SetVisibility(true);
+	//Sphere->SetVisibility(true);
+	//Sphere->SetCollisionProfileName(TEXT("Destructible"));
 }
 
 void ATargetSphere::Explode(const FVector & Location)

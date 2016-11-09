@@ -37,7 +37,8 @@ ATargets::ATargets()
 	Cube->SetCollisionProfileName(TEXT("OverlapAll"));
 	RootComponent = Cube;
 
-	SphereNumber = 10;
+	SphereTemplate = nullptr;
+	SphereNumber = 20;
 	RebuildTime = 5.f;
 }
 
@@ -45,11 +46,6 @@ ATargets::ATargets()
 void ATargets::BeginPlay()
 {
 	Super::BeginPlay();
-
-	SphereTemplate = nullptr;
-	for (TActorIterator<ATargetSphere> ActorItr(GetWorld()); ActorItr; ++ActorItr)
-		if (ActorItr->GetActorLabel() == GetActorLabel() + "_SphereTemplate")
-			SphereTemplate = *ActorItr;
 	
 	for (int32 SphereId = 0; SphereId < SphereNumber; ++SphereId)
 	{
