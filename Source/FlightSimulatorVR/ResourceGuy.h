@@ -23,12 +23,6 @@ public:
 
 	UPROPERTY(Category = AMainHUD, EditAnywhere)
 	class UFont* AMainHUD_WastedFont;
-
-	UPROPERTY(Category = ATargets, EditAnywhere)
-	class UStaticMesh* ATargets_Cube;
-
-	UPROPERTY(Category = ATargets, EditAnywhere)
-	class UMaterial* ATargets_Glass;
 };
 
 class AResourceGuy* GetFirstResourceGuy(class UWorld* World);
