@@ -101,21 +101,24 @@ void AMainHUD::SetMode(Mode NewMode)
 {
 	CurrentMode = NewMode;
 
+	if (!PlayerOwner)
+		return;
+
 	switch (CurrentMode)
 	{
 	case Mode::MainMenu:
 	case Mode::GameOver:
-		GetOwningPlayerController()->bShowMouseCursor = true;
-		GetOwningPlayerController()->bEnableMouseOverEvents = true;
-		GetOwningPlayerController()->bEnableClickEvents = true;
+		PlayerOwner->bShowMouseCursor = true;
+		PlayerOwner->bEnableMouseOverEvents = true;
+		PlayerOwner->bEnableClickEvents = true;
 		break;
 	case Mode::InGame:
 	case Mode::InGameTutorial:
-		GetOwningPlayerController()->bShowMouseCursor = false;
-		GetOwningPlayerController()->bEnableMouseOverEvents = false;
-		GetOwningPlayerController()->bEnableClickEvents = false;
+		PlayerOwner->bShowMouseCursor = false;
+		PlayerOwner->bEnableMouseOverEvents = false;
+		PlayerOwner->bEnableClickEvents = false;
 
-		APawn* Pawn = GetOwningPlayerController()->GetPawn();
+		APawn* Pawn = PlayerOwner->GetPawn();
 		if (Pawn->IsA(AFlightSimulatorVRPawn::StaticClass()))
 			Cast<AFlightSimulatorVRPawn>(Pawn)->StartFlying();
 		break;
