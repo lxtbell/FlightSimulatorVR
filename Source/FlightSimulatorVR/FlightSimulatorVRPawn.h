@@ -94,7 +94,10 @@ private:
 	float RollSpeed;
 
 	UPROPERTY(Category = Missile, EditAnywhere)
-	float FireRate;
+	class AMissile* MissileTemplate;
+
+	UPROPERTY(Category = Missile, EditAnywhere)
+	float MissileFireRate;
 
 	UPROPERTY(Category = Missile, EditAnywhere)
 	TArray<FVector> MissileLocations;
@@ -142,8 +145,6 @@ private:
 	float CurrentRollSpeed;
 
 	FTimerHandle FireTimerHandle;
-
-	class AMissile* MissileTemplate;
 
 	int32 TotalMissiles;
 	int32 CurrentMissile;

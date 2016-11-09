@@ -69,7 +69,8 @@ AFlightSimulatorVRPawn::AFlightSimulatorVRPawn()
 	YawSpeed = 15.f;
 	RollSpeed = 90.f;
 
-	FireRate = 0.5f;
+	MissileTemplate = nullptr;
+	MissileFireRate = 0.5f;
 	MissileLocations.Add(FVector(0));
 	MissileLocations.Add(FVector(0));
 
@@ -102,23 +103,13 @@ void AFlightSimulatorVRPawn::BeginPlay()
 	CurrentYawSpeed = 0.f;
 	CurrentRollSpeed = 0.f;
 
-	MissileTemplate = nullptr;
-	for (TActorIterator<AMissile> ActorItr(GetWorld()); ActorItr; ++ActorItr) {
-		UE_LOG(LogTemp, Warning, TEXT("AFlightSimulatorVRPawn::ActorItr %s =?= %s"), *ActorItr->GetActorLabel(), *(GetActorLabel() + "_MissileTemplate"));
-		if (ActorItr->GetActorLabel() == GetActorLabel() + "_MissileTemplate")
-		{
-			UE_LOG(LogTemp, Warning, TEXT("AFlightSimulatorVRPawn::ActorItr Found!"));
-			MissileTemplate = *ActorItr;
-		}
-	}
 	TotalMissiles = MissileLocations.Num();
 	CurrentMissile = 0;
 
-	PilotState = nullptr;
 	MainHUD = nullptr;
-	if (GetController()->IsA(APlayerController::StaticClass()))
+	if (Controller->IsA(APlayerController::StaticClass()))
 	{
-		APlayerController* PlayerController = Cast<APlayerController>(GetController());
+		APlayerController* PlayerController = Cast<APlayerController>(Controller);
 		
 		AHUD* HUD = PlayerController->GetHUD();
 		if (HUD->IsA(AMainHUD::StaticClass()))
@@ -126,12 +117,12 @@ void AFlightSimulatorVRPawn::BeginPlay()
 			MainHUD = Cast<AMainHUD>(HUD);
 			MainHUD->SetMode(AMainHUD::Mode::InGame);
 		}
+	}
 
-		APlayerState* PlayerState = PlayerController->PlayerState;
-		if (PlayerState->IsA(APilotState::StaticClass()))
-		{
-			PilotState = Cast<APilotState>(PlayerState);
-		}
+	PilotState = nullptr;
+	if (PlayerState->IsA(APilotState::StaticClass()))
+	{
+		PilotState = Cast<APilotState>(PlayerState);
 	}
 }
 
@@ -202,7 +193,6 @@ void AFlightSimulatorVRPawn::NotifyHit(class UPrimitiveComponent* MyComp, class 
 
 			CurrentStage = Stage::Exploded;
 
-			AController* Controller = GetController();
 			if (Controller->IsA(APlayerController::StaticClass()))
 			{
 				AHUD* HUD = Cast<APlayerController>(Controller)->GetHUD();
@@ -259,7 +249,7 @@ void AFlightSimulatorVRPawn::SetupPlayerInputComponent(class UInputComponent* Pl
 
 void AFlightSimulatorVRPawn::StartFire()
 {
-	GetWorldTimerManager().SetTimer(FireTimerHandle, this, &AFlightSimulatorVRPawn::Fire, FireRate, true, 0.f);
+	GetWorldTimerManager().SetTimer(FireTimerHandle, this, &AFlightSimulatorVRPawn::Fire, MissileFireRate, true, 0.f);
 }
 
 void AFlightSimulatorVRPawn::StopFire()

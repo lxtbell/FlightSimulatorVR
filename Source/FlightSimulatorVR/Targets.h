@@ -30,6 +30,9 @@ protected:
 
 private:
 	UPROPERTY(Category = Volume, EditAnywhere)
+	class ATargetSphere* SphereTemplate;
+
+	UPROPERTY(Category = Volume, EditAnywhere)
 	int32 SphereNumber;
 
 	UPROPERTY(Category = Volume, EditAnywhere)
@@ -49,7 +52,6 @@ private:
 		}
 	};
 
-	ATargetSphere* SphereTemplate;
 	TArray<SphereInfo> Spheres;
 	TQueue<SphereInfo*> FracturedSpheres;
 };
