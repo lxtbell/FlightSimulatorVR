@@ -54,6 +54,8 @@ protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override; // Allows binding actions/axes to functions
 	// End APawn overrides
 
+	virtual void ExitGame();
+
 	virtual void StartFire();
 	virtual void StopFire();
 

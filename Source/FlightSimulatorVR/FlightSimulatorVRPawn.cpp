@@ -107,12 +107,12 @@ void AFlightSimulatorVRPawn::BeginPlay()
 	CurrentMissile = 0;
 
 	MainHUD = nullptr;
-	if (Controller->IsA(APlayerController::StaticClass()))
+	if (Controller && Controller->IsA(APlayerController::StaticClass()))
 	{
 		APlayerController* PlayerController = Cast<APlayerController>(Controller);
 		
 		AHUD* HUD = PlayerController->GetHUD();
-		if (HUD->IsA(AMainHUD::StaticClass()))
+		if (HUD && HUD->IsA(AMainHUD::StaticClass()))
 		{
 			MainHUD = Cast<AMainHUD>(HUD);
 			MainHUD->SetMode(AMainHUD::Mode::InGame);
@@ -120,7 +120,7 @@ void AFlightSimulatorVRPawn::BeginPlay()
 	}
 
 	PilotState = nullptr;
-	if (PlayerState->IsA(APilotState::StaticClass()))
+	if (PlayerState && PlayerState->IsA(APilotState::StaticClass()))
 	{
 		PilotState = Cast<APilotState>(PlayerState);
 	}
@@ -239,12 +239,22 @@ void AFlightSimulatorVRPawn::SetupPlayerInputComponent(class UInputComponent* Pl
 	check(PlayerInputComponent);
 
 	// Bind our control axis' to callback functions
+	PlayerInputComponent->BindAction("Exit", IE_Pressed, this, &AFlightSimulatorVRPawn::ExitGame);
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AFlightSimulatorVRPawn::StartFire);
 	PlayerInputComponent->BindAction("Fire", IE_Released, this, &AFlightSimulatorVRPawn::StopFire);
+
 	PlayerInputComponent->BindAxis("PitchUp", this, &AFlightSimulatorVRPawn::PitchUpInput);
 	PlayerInputComponent->BindAxis("YawRight", this, &AFlightSimulatorVRPawn::YawRightInput);
 	PlayerInputComponent->BindAxis("Thrust", this, &AFlightSimulatorVRPawn::ThrustInput);
 	PlayerInputComponent->BindAxis("RollRight", this, &AFlightSimulatorVRPawn::RollRightInput);
+}
+
+void AFlightSimulatorVRPawn::ExitGame()
+{
+	if (Controller && Controller->IsA(APlayerController::StaticClass()))
+	{
+		Cast<APlayerController>(Controller)->ConsoleCommand("quit");
+	}
 }
 
 void AFlightSimulatorVRPawn::StartFire()
