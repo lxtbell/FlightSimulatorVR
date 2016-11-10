@@ -2,6 +2,7 @@
 
 #include "FlightSimulatorVR.h"
 #include "Missile.h"
+
 #include "PhysicsEngine/RadialForceComponent.h"
 #include "PhysicsEngine/DestructibleActor.h"
 #include "Components/StaticMeshComponent.h"
@@ -62,8 +63,10 @@ void AMissile::BeginPlay()
 	CurrentForwardSpeed = InitialSpeed;
 }
 
-void AMissile::Activate(float LaunchSpeed, class AFlightSimulatorVRPawn* MissileLauncher)
+void AMissile::Activate(class AFlightSimulatorVRPawn* WeaponLauncher)
 {
+	Super::Activate(WeaponLauncher);
+
 	if (CurrentStage != Stage::Created)
 		return;
 
@@ -71,7 +74,7 @@ void AMissile::Activate(float LaunchSpeed, class AFlightSimulatorVRPawn* Missile
 
 	MissileSound->Play();
 
-	CurrentForwardSpeed += LaunchSpeed;
+	CurrentForwardSpeed += WeaponLauncher->GetForwardSpeed();
 	CurrentStage = Stage::Activated;
 
 	FTimerHandle UnlockTimerHandle;
@@ -79,8 +82,6 @@ void AMissile::Activate(float LaunchSpeed, class AFlightSimulatorVRPawn* Missile
 
 	FTimerHandle SelfDestoryTimerHandle;
 	GetWorldTimerManager().SetTimer(SelfDestoryTimerHandle, this, &AMissile::Explode, FlyTime);
-
-	Launcher = MissileLauncher;
 
 	//UE_LOG(LogTemp, Warning, TEXT("AMissile::Activate %.4f"), CurrentForwardSpeed);
 }
@@ -119,16 +120,8 @@ void AMissile::NotifyHit(class UPrimitiveComponent* MyComp, class AActor* Other,
 
 	if (CurrentStage == Stage::Unlocked && Other != Launcher)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("AMissile::Explode %s"), *Other->GetName());
+		OnWeaponHit(Other, HitLocation);
 
-		// TODO Assume ATargetSphere has Owner
-		if (Other->IsA(ATargetSphere::StaticClass()))
-		{
-			AActor* OtherOwner = Other->GetOwner();
-			if (OtherOwner && OtherOwner->IsA(ATargets::StaticClass()))
-				Cast<ATargets>(OtherOwner)->OnTargetHit(Other, HitLocation, Launcher);
-		}
-			
 		Explode();
 	}
 }
@@ -166,5 +159,5 @@ void AMissile::Remove()
 {
 	CurrentStage = Stage::Removed;
 
-	Destroy();
+	Super::Remove();
 }

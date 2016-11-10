@@ -8,7 +8,7 @@
 #include "Components/ChildActorComponent.h"
 #include "Components/AudioComponent.h"
 #include "Public/EngineUtils.h"
-#include "Missile.h"
+#include "Weapon.h"
 #include "Targets.h"
 #include "TargetSphere.h"
 #include "PilotState.h"
@@ -67,10 +67,14 @@ AFlightSimulatorVRPawn::AFlightSimulatorVRPawn()
 	YawSpeed = 15.f;
 	RollSpeed = 90.f;
 
-	MissileTemplate = nullptr;
-	MissileFireRate = 0.5f;
-	MissileLocations.Add(FVector(0));
-	MissileLocations.Add(FVector(0));
+	PrimaryWeaponTemplate = NULL;
+	PrimaryWeaponFireRate = 0.5f;
+	PrimaryWeaponLocations.Add(FVector(20, 15, -10));
+	PrimaryWeaponLocations.Add(FVector(20, -15, -10));
+
+	SecondaryWeaponTemplate = NULL;
+	SecondaryWeaponFireRate = 0.5f;
+	SecondaryWeaponLocations.Add(FVector(0, 0, -10));
 
 	SelfDestructionDamage = 25000.f;
 	SelfDestructionRadius = 200.f;
@@ -109,8 +113,8 @@ void AFlightSimulatorVRPawn::BeginPlay()
 	CurrentYawSpeed = 0.f;
 	CurrentRollSpeed = 0.f;
 
-	TotalMissiles = MissileLocations.Num();
-	CurrentMissile = 0;
+	CurrentPrimaryWeapon = 0;
+	CurrentSecondaryWeapon = 0;
 
 	MainHUD = nullptr;
 	if (Controller && Controller->IsA(APlayerController::StaticClass()))
@@ -172,8 +176,8 @@ void AFlightSimulatorVRPawn::NotifyHit(class UPrimitiveComponent* MyComp, class 
 	{
 		bool bExplode = true;
 
-		if (Other->IsA(AMissile::StaticClass()))
-			if (Cast<AMissile>(Other)->GetLauncher() == this)
+		if (Other->IsA(AWeapon::StaticClass()))
+			if (Cast<AWeapon>(Other)->GetLauncher() == this)
 				bExplode = false;
 
 		if (Other->IsA(ATargetSphere::StaticClass()))
@@ -246,8 +250,10 @@ void AFlightSimulatorVRPawn::SetupPlayerInputComponent(class UInputComponent* Pl
 
 	// Bind our control axis' to callback functions
 	PlayerInputComponent->BindAction("Exit", IE_Pressed, this, &AFlightSimulatorVRPawn::ExitGame);
-	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AFlightSimulatorVRPawn::StartFire);
-	PlayerInputComponent->BindAction("Fire", IE_Released, this, &AFlightSimulatorVRPawn::StopFire);
+	PlayerInputComponent->BindAction("FirePrimary", IE_Pressed, this, &AFlightSimulatorVRPawn::StartFirePrimary);
+	PlayerInputComponent->BindAction("FirePrimary", IE_Released, this, &AFlightSimulatorVRPawn::StopFirePrimary);
+	PlayerInputComponent->BindAction("FireSecondary", IE_Pressed, this, &AFlightSimulatorVRPawn::StartFireSecondary);
+	PlayerInputComponent->BindAction("FireSecondary", IE_Released, this, &AFlightSimulatorVRPawn::StopFireSecondary);
 
 	PlayerInputComponent->BindAxis("PitchUp", this, &AFlightSimulatorVRPawn::PitchUpInput);
 	PlayerInputComponent->BindAxis("YawRight", this, &AFlightSimulatorVRPawn::YawRightInput);
@@ -263,17 +269,24 @@ void AFlightSimulatorVRPawn::ExitGame()
 	}
 }
 
-void AFlightSimulatorVRPawn::StartFire()
+void AFlightSimulatorVRPawn::StartFirePrimary()
 {
-	GetWorldTimerManager().SetTimer(FireTimerHandle, this, &AFlightSimulatorVRPawn::Fire, MissileFireRate, true, 0.f);
+	GetWorldTimerManager().SetTimer(PrimaryWeaponTimerHandle, this, &AFlightSimulatorVRPawn::FirePrimary, PrimaryWeaponFireRate, true, 0.f);
 }
 
-void AFlightSimulatorVRPawn::StopFire()
+void AFlightSimulatorVRPawn::StopFirePrimary()
 {
-	if (!FireTimerHandle.IsValid())
-		return;
-	
-	GetWorldTimerManager().ClearTimer(FireTimerHandle);
+	GetWorldTimerManager().ClearTimer(PrimaryWeaponTimerHandle);
+}
+
+void AFlightSimulatorVRPawn::StartFireSecondary()
+{
+	GetWorldTimerManager().SetTimer(SecondaryWeaponTimerHandle, this, &AFlightSimulatorVRPawn::FireSecondary, SecondaryWeaponFireRate, true, 0.f);
+}
+
+void AFlightSimulatorVRPawn::StopFireSecondary()
+{
+	GetWorldTimerManager().ClearTimer(SecondaryWeaponTimerHandle);
 }
 
 void AFlightSimulatorVRPawn::PitchUpInput(float Val)
@@ -343,26 +356,40 @@ void AFlightSimulatorVRPawn::RollRightInput(float Val)
 	CurrentRollSpeed = FMath::FInterpTo(CurrentRollSpeed, TargetRollSpeed, GetWorld()->GetDeltaSeconds(), 2.f);
 }
 
-void AFlightSimulatorVRPawn::Fire()
+void AFlightSimulatorVRPawn::Fire(class AWeapon* WeaponTemplate, const TArray<FVector> & WeaponLocations, int32 & CurrentWeapon)
 {
-	if (CurrentStage != Stage::Flying)
+	if (CurrentStage != Stage::Flying || !WeaponTemplate || CurrentWeapon >= WeaponLocations.Num() || CurrentWeapon < 0)
 		return;
 
 	FRotator ActorRotation = GetActorRotation();
 
 	// Make a location for the new actor to spawn at
-	FVector NewLocation = GetActorLocation() + ActorRotation.RotateVector(MissileLocations[CurrentMissile]);
-	CurrentMissile = (CurrentMissile + 1) % TotalMissiles;
+	FVector NewLocation = GetActorLocation() + ActorRotation.RotateVector(WeaponLocations[CurrentWeapon]);
+	CurrentWeapon = (CurrentWeapon + 1) % WeaponLocations.Num();
 
 	// Spawn the new actor (Using GetClass() instead of AMySpawner so that if someone derives a new class  
 	// from AMySpawner we spawn an instance of that class instead)
 	FActorSpawnParameters Parameters;
-	if (MissileTemplate != nullptr)
-		Parameters.Template = MissileTemplate;
+	Parameters.Template = WeaponTemplate;
 
-	AMissile* NewActor = GetWorld()->SpawnActor<AMissile>(AMissile::StaticClass(), NewLocation, ActorRotation, Parameters);
-	NewActor->Activate(CurrentForwardSpeed, this);
+	UE_LOG(LogTemp, Warning, TEXT("AFlightSimulatorVRPawn::Fire %s"), *WeaponTemplate->GetWeaponClass()->GetName());
 
-	if (PilotState != nullptr)
-		PilotState->MissileFired += 1;
+	AWeapon* NewActor = GetWorld()->SpawnActor<AWeapon>(WeaponTemplate->GetWeaponClass(), NewLocation, ActorRotation, Parameters);
+	if (NewActor)
+	{
+		NewActor->Activate(this);
+
+		if (PilotState != nullptr)
+			PilotState->RecordWeaponFire(WeaponTemplate->GetWeaponType());
+	}
+}
+
+void AFlightSimulatorVRPawn::FirePrimary()
+{
+	Fire(PrimaryWeaponTemplate, PrimaryWeaponLocations, CurrentPrimaryWeapon);
+}
+
+void AFlightSimulatorVRPawn::FireSecondary()
+{
+	Fire(SecondaryWeaponTemplate, SecondaryWeaponLocations, CurrentSecondaryWeapon);
 }

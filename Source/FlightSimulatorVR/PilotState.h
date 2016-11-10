@@ -25,13 +25,21 @@ public:
 
 	float SecondsPlayed;
 
-	float MissileFired;
+	float TotalWeaponFired;
 
-	float MissileHit;
+	float TotalWeaponHit;
+
+	TMap<FName, float> WeaponFired;
+
+	TMap<FName, float> WeaponHit;
 
 	int32 CurrentStreak;
 
 	float CurrentStreakTime;
+
+	void RecordWeaponFire(const FName & WeaponType);
+
+	void RecordWeaponHit(const FName & WeaponType);
 
 	virtual float GetScorePerMinute();
 
