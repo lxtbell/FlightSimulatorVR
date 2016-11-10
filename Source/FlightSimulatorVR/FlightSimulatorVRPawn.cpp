@@ -20,9 +20,7 @@
 
 AFlightSimulatorVRPawn::AFlightSimulatorVRPawn()
 {
-	// Create static mesh component
-	//PlaneMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PlaneMesh0"));
-	//RootComponent = PlaneMesh;
+	SpawnCollisionHandlingMethod = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
 	Plane = CreateDefaultSubobject<UDestructibleComponent>(TEXT("Plane0"));
 	//Plane->SetCollisionProfileName(TEXT("OverlapAll"));
@@ -74,14 +72,22 @@ AFlightSimulatorVRPawn::AFlightSimulatorVRPawn()
 	MissileLocations.Add(FVector(0));
 	MissileLocations.Add(FVector(0));
 
-	ExplodedCameraDistance = 800.f;
-	ExplodedCameraSpeed = 10.f;
-	ExplodedTimeDilation = 0.2f;
 	SelfDestructionDamage = 25000.f;
 	SelfDestructionRadius = 200.f;
 	SelfDestructionImpulse = 0.f;
 
-	ExplodedLenseSetting = FPostProcessSettings();
+	ExplodedCameraDistance = 800.f;
+	ExplodedCameraSpeed = 10.f;
+	ExplodedTimeDilation = 0.2f;
+	ExplodedLensSettings = FPostProcessSettings();
+	ExplodedLensSettings.bOverride_FilmSaturation = true;
+	ExplodedLensSettings.FilmSaturation = 0.f;
+	ExplodedLensSettings.bOverride_FilmContrast = true;
+	ExplodedLensSettings.FilmContrast = 0.5f;
+	ExplodedLensSettings.bOverride_SceneFringeIntensity = true;
+	ExplodedLensSettings.SceneFringeIntensity = 0.8f;
+	ExplodedLensSettings.bOverride_VignetteIntensity = true;
+	ExplodedLensSettings.VignetteIntensity = 0.8f;
 
 	CurrentStage = Stage::Created;
 
@@ -189,7 +195,7 @@ void AFlightSimulatorVRPawn::NotifyHit(class UPrimitiveComponent* MyComp, class 
 			ExplosionSound->Play();
 			UGameplayStatics::SetGlobalTimeDilation(GetWorld(), ExplodedTimeDilation);
 			
-			Camera->PostProcessSettings = ExplodedLenseSetting;
+			Camera->PostProcessSettings = ExplodedLensSettings;
 
 			CurrentStage = Stage::Exploded;
 

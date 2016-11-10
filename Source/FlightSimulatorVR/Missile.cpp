@@ -19,6 +19,7 @@ AMissile::AMissile()
 	PrimaryActorTick.bCanEverTick = true;
 
 	Missile = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Missile0"));
+	Missile->SetVisibility(false);
 	Missile->SetCollisionProfileName(TEXT("OverlapAll"));
 	RootComponent = Missile;
 

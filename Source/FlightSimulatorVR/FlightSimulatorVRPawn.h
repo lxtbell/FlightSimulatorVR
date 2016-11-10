@@ -105,15 +105,6 @@ private:
 	TArray<FVector> MissileLocations;
 
 	UPROPERTY(Category = Misc, EditAnywhere)
-	float ExplodedCameraDistance;
-
-	UPROPERTY(Category = Misc, EditAnywhere)
-	float ExplodedCameraSpeed;
-
-	UPROPERTY(Category = Misc, EditAnywhere)
-	float ExplodedTimeDilation;
-
-	UPROPERTY(Category = Misc, EditAnywhere)
 	float SelfDestructionDamage;
 
 	UPROPERTY(Category = Misc, EditAnywhere)
@@ -122,11 +113,20 @@ private:
 	UPROPERTY(Category = Misc, EditAnywhere)
 	float SelfDestructionImpulse;
 
+	UPROPERTY(Category = Misc, EditAnywhere)
+	float ExplodedCameraDistance;
+
+	UPROPERTY(Category = Misc, EditAnywhere)
+	float ExplodedCameraSpeed;
+
+	UPROPERTY(Category = Misc, EditAnywhere)
+	float ExplodedTimeDilation;
+
 	UPROPERTY(Category = Sound, EditAnywhere)
 	TArray<USoundCue*> StreakSounds;
 
 	UPROPERTY(Category = Misc, EditAnywhere)
-	FPostProcessSettings ExplodedLenseSetting;
+	FPostProcessSettings ExplodedLensSettings;
 
 	/** Throttle interpolation */
 
