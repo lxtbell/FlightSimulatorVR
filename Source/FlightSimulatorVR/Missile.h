@@ -2,14 +2,17 @@
 
 #pragma once
 
-#include "GameFramework/Actor.h"
+#include "Weapon.h"
 #include "Missile.generated.h"
 
+/**
+ * 
+ */
 UCLASS()
-class FLIGHTSIMULATORVR_API AMissile : public AActor
+class FLIGHTSIMULATORVR_API AMissile : public AWeapon
 {
 	GENERATED_BODY()
-
+	
 	UPROPERTY(Category = Plane, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UStaticMeshComponent* Missile;
 
@@ -27,27 +30,27 @@ class FLIGHTSIMULATORVR_API AMissile : public AActor
 
 	UPROPERTY(Category = Physics, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UAudioComponent* ExplosionSound;
-
-public:	
+	
+public:
 	// Sets default values for this actor's properties
 	AMissile();
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	virtual void Activate(float LaunchSpeed = 0, class AFlightSimulatorVRPawn* MissileLauncher = nullptr);
+	virtual void Activate(class AFlightSimulatorVRPawn* WeaponLauncher) override;
 
-	virtual void Unlock();
-	
 	// Called every frame
 	virtual void Tick(float DeltaSeconds) override;
 
 	virtual void NotifyHit(class UPrimitiveComponent* MyComp, class AActor* Other, class UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit) override;
+	
+	virtual void Unlock();
 
 	virtual void Explode();
 
 protected:
-	virtual void Remove();
+	virtual void Remove() override;
 
 private:
 	UPROPERTY(Category = Missile, EditAnywhere)
@@ -80,8 +83,8 @@ private:
 	};
 	Stage CurrentStage;
 
-	class AFlightSimulatorVRPawn* Launcher;
-
 public:
-	FORCEINLINE class AFlightSimulatorVRPawn* GetLauncher() const { return Launcher; }
+	FORCEINLINE virtual class UClass* GetWeaponClass() const { return StaticClass(); }
+
+	FORCEINLINE virtual FName GetWeaponType() const { return TEXT("Missile"); }
 };

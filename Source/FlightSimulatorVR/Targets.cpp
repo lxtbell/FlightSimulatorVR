@@ -13,6 +13,7 @@
 #include "PilotState.h"
 #include "FlightSimulatorVRPawn.h"
 #include "ResourceGuy.h"
+#include "Weapon.h"
 
 
 // Sets default values
@@ -49,7 +50,7 @@ void ATargets::BeginPlay()
 	}
 }
 
-void ATargets::OnTargetHit(AActor* Target, const FVector & Location, class AFlightSimulatorVRPawn* Pawn)
+void ATargets::OnTargetHit(AActor* Target, const FVector & Location, class AFlightSimulatorVRPawn* Pawn, class AWeapon* Weapon)
 {
 	UE_LOG(LogTemp, Warning, TEXT("ATargets::OnTargetHit %s"), *Target->GetName());
 
@@ -65,11 +66,7 @@ void ATargets::OnTargetHit(AActor* Target, const FVector & Location, class AFlig
 			APilotState* PilotState = Pawn->GetPilotState();
 			if (PilotState != nullptr)
 			{
-				PilotState->Score += 1;
-				PilotState->MissileHit += 1;
-
-				PilotState->CurrentStreak += 1;
-				PilotState->CurrentStreakTime = 0;
+				PilotState->RecordWeaponHit(Weapon->GetWeaponType());
 
 				Pawn->PlayStreakSound(PilotState->CurrentStreak);
 			}
