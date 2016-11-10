@@ -6,5 +6,3 @@
 IMPLEMENT_PRIMARY_GAME_MODULE(FDefaultGameModuleImpl, FlightSimulatorVR, "FlightSimulatorVR");
 
 DEFINE_LOG_CATEGORY(LogFlying)
-
- 
