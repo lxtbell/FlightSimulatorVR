@@ -1,5 +1,7 @@
 // Copyright 1998-2016 Epic Games, Inc. All Rights Reserved.
+
 #pragma once
+
 #include "GameFramework/Pawn.h"
 #include "FlightSimulatorVRPawn.generated.h"
 
@@ -56,15 +58,19 @@ protected:
 
 	virtual void ExitGame();
 
-	virtual void StartFire();
-	virtual void StopFire();
+	virtual void StartFirePrimary();
+	virtual void StopFirePrimary();
+	virtual void StartFireSecondary();
+	virtual void StopFireSecondary();
 
 	virtual void PitchUpInput(float Val);
 	virtual void YawRightInput(float Val);
 	virtual void ThrustInput(float Val);
 	virtual void RollRightInput(float Val);
 
-	virtual void Fire();
+	virtual void Fire(class AWeapon* WeaponTemplate, const TArray<FVector> & WeaponLocations, int32 & CurrentWeapon);
+	virtual void FirePrimary();
+	virtual void FireSecondary();
 
 private:
 	/** Max forward speed */
@@ -95,23 +101,23 @@ private:
 	UPROPERTY(Category = Plane, EditAnywhere)
 	float RollSpeed;
 
-	UPROPERTY(Category = Missile, EditAnywhere)
-	class AMissile* MissileTemplate;
+	UPROPERTY(Category = PrimaryWeapon, EditAnywhere)
+	class AWeapon* PrimaryWeaponTemplate;
 
-	UPROPERTY(Category = Missile, EditAnywhere)
-	float MissileFireRate;
+	UPROPERTY(Category = PrimaryWeapon, EditAnywhere)
+	float PrimaryWeaponFireRate;
 
-	UPROPERTY(Category = Missile, EditAnywhere)
-	TArray<FVector> MissileLocations;
+	UPROPERTY(Category = PrimaryWeapon, EditAnywhere)
+	TArray<FVector> PrimaryWeaponLocations;
 
-	UPROPERTY(Category = Misc, EditAnywhere)
-	float ExplodedCameraDistance;
+	UPROPERTY(Category = SecondaryWeapon, EditAnywhere)
+	class AWeapon* SecondaryWeaponTemplate;
 
-	UPROPERTY(Category = Misc, EditAnywhere)
-	float ExplodedCameraSpeed;
+	UPROPERTY(Category = SecondaryWeapon, EditAnywhere)
+	float SecondaryWeaponFireRate;
 
-	UPROPERTY(Category = Misc, EditAnywhere)
-	float ExplodedTimeDilation;
+	UPROPERTY(Category = SecondaryWeapon, EditAnywhere)
+	TArray<FVector> SecondaryWeaponLocations;
 
 	UPROPERTY(Category = Misc, EditAnywhere)
 	float SelfDestructionDamage;
@@ -122,11 +128,20 @@ private:
 	UPROPERTY(Category = Misc, EditAnywhere)
 	float SelfDestructionImpulse;
 
+	UPROPERTY(Category = Misc, EditAnywhere)
+	float ExplodedCameraDistance;
+
+	UPROPERTY(Category = Misc, EditAnywhere)
+	float ExplodedCameraSpeed;
+
+	UPROPERTY(Category = Misc, EditAnywhere)
+	float ExplodedTimeDilation;
+
 	UPROPERTY(Category = Sound, EditAnywhere)
 	TArray<USoundCue*> StreakSounds;
 
 	UPROPERTY(Category = Misc, EditAnywhere)
-	FPostProcessSettings ExplodedLenseSetting;
+	FPostProcessSettings ExplodedLensSettings;
 
 	/** Throttle interpolation */
 
@@ -146,10 +161,11 @@ private:
 	/** Current roll speed */
 	float CurrentRollSpeed;
 
-	FTimerHandle FireTimerHandle;
+	FTimerHandle PrimaryWeaponTimerHandle;
+	int32 CurrentPrimaryWeapon;
 
-	int32 TotalMissiles;
-	int32 CurrentMissile;
+	FTimerHandle SecondaryWeaponTimerHandle;
+	int32 CurrentSecondaryWeapon;
 
 	enum class Stage
 	{
@@ -165,4 +181,6 @@ private:
 
 public:
 	FORCEINLINE class APilotState* GetPilotState() const { return PilotState; }
+
+	FORCEINLINE float GetForwardSpeed() const { return CurrentForwardSpeed; }
 };

@@ -13,8 +13,6 @@ APilotState::APilotState()
 
 	Score = 0.f;
 	SecondsPlayed = 0.f;
-	MissileFired = 0.f;
-	MissileHit = 0.f;
 	CurrentStreak = 0;
 	CurrentStreakTime = 0.f;
 }
@@ -31,6 +29,28 @@ void APilotState::Tick(float DeltaSeconds)
 	}
 }
 
+void APilotState::RecordWeaponFire(const FName & WeaponType)
+{
+	if (!WeaponFired.Contains(WeaponType))
+		WeaponFired.Add(WeaponType, 0);
+
+	TotalWeaponFired += 1;
+	WeaponFired[WeaponType] += 1;
+}
+
+void APilotState::RecordWeaponHit(const FName & WeaponType)
+{
+	if (!WeaponHit.Contains(WeaponType))
+		WeaponHit.Add(WeaponType, 0);
+
+	Score += 1;
+	TotalWeaponHit += 1;
+	WeaponHit[WeaponType] += 1;
+
+	CurrentStreak += 1;
+	CurrentStreakTime = 0;
+}
+
 float APilotState::GetScorePerMinute()
 {
 	return (SecondsPlayed == 0) ? 0 : (Score / SecondsPlayed * 60);
@@ -38,5 +58,5 @@ float APilotState::GetScorePerMinute()
 
 float APilotState::GetAccuracy()
 {
-	return (MissileFired == 0) ? 1 : (MissileHit / MissileFired);
+	return (TotalWeaponFired == 0) ? 1 : (TotalWeaponHit / TotalWeaponFired);
 }
