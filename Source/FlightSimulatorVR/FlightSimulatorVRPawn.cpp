@@ -90,6 +90,16 @@ AFlightSimulatorVRPawn::AFlightSimulatorVRPawn()
 	SecondaryWeaponFireRate = 0.5f;
 	SecondaryWeaponLocations.Add(FVector(0, 0, -10));
 
+	FireworksTemplate = NULL;
+	FireworksFireRate = 1.f;
+	FireworksFirePause = 1.f;
+	FireworksLocations.Add(FVector(20, 15, -10));
+	FireworksLocations.Add(FVector(20, -15, -10));
+	FireworksScale = 30.f;
+
+	FireworksFinaleTemplate = NULL;
+	FireworksFinaleLocation = FVector(40, 0, -40);
+
 	SelfDestructionDamage = 25000.f;
 	SelfDestructionRadius = 200.f;
 	SelfDestructionImpulse = 0.f;
@@ -127,6 +137,28 @@ void AFlightSimulatorVRPawn::BeginPlay()
 
 	CurrentPrimaryWeapon = 0;
 	CurrentSecondaryWeapon = 0;
+	CurrentFireworksSlot = 0;
+	CurrentFireworksTexture = 0;
+	CurrentFireworksPoint = 0;
+
+	for (UTexture2D* FireworksTexture : FireworksTextures)
+	{
+		Fireworks.Add(TArray<FVector>());
+		TArray<FVector> & Vectors = Fireworks.Last();
+
+		FTexture2DMipMap* MipMap = &FireworksTexture->PlatformData->Mips[0];
+		FColor* FormatedImageData = static_cast<FColor*>(MipMap->BulkData.Lock(LOCK_READ_ONLY));
+
+		for (int32 Index = 0; Index < MipMap->SizeY; ++Index)
+		{
+			FColor & Point = FormatedImageData[Index];
+			FVector PointData(Point.R, Point.G, Point.B);
+			PointData /= 255; PointData.X -= 0.5; PointData.Y -= 0.5;
+			Vectors.Add(PointData);
+		}
+
+		MipMap->BulkData.Unlock();
+	}
 
 	MainHUD = nullptr;
 	if (Controller && Controller->IsA(APlayerController::StaticClass()))
@@ -267,6 +299,7 @@ void AFlightSimulatorVRPawn::SetupPlayerInputComponent(class UInputComponent* Pl
 	PlayerInputComponent->BindAction("FirePrimary", IE_Released, this, &AFlightSimulatorVRPawn::StopFirePrimary);
 	PlayerInputComponent->BindAction("FireSecondary", IE_Pressed, this, &AFlightSimulatorVRPawn::StartFireSecondary);
 	PlayerInputComponent->BindAction("FireSecondary", IE_Released, this, &AFlightSimulatorVRPawn::StopFireSecondary);
+	PlayerInputComponent->BindAction("PlayFireworks", IE_Pressed, this, &AFlightSimulatorVRPawn::PlayFireworks);
 
 	PlayerInputComponent->BindAxis("PitchUp", this, &AFlightSimulatorVRPawn::PitchUpInput);
 	PlayerInputComponent->BindAxis("YawRight", this, &AFlightSimulatorVRPawn::YawRightInput);
@@ -382,13 +415,16 @@ void AFlightSimulatorVRPawn::RollRightInput(float Val)
 
 void AFlightSimulatorVRPawn::Fire(class AWeapon* WeaponTemplate, const TArray<FVector> & WeaponLocations, int32 & CurrentWeapon)
 {
+	Fire(WeaponTemplate, WeaponLocations, CurrentWeapon, GetActorRotation());
+}
+
+void AFlightSimulatorVRPawn::Fire(class AWeapon* WeaponTemplate, const TArray<FVector> & WeaponLocations, int32 & CurrentWeapon, const FRotator & WeaponRotation)
+{
 	if (CurrentStage != Stage::Flying || !WeaponTemplate || CurrentWeapon >= WeaponLocations.Num() || CurrentWeapon < 0)
 		return;
 
-	FRotator ActorRotation = GetActorRotation();
-
 	// Make a location for the new actor to spawn at
-	FVector NewLocation = GetActorLocation() + ActorRotation.RotateVector(WeaponLocations[CurrentWeapon]);
+	FVector NewLocation = GetActorLocation() + WeaponRotation.RotateVector(WeaponLocations[CurrentWeapon]);
 	CurrentWeapon = (CurrentWeapon + 1) % WeaponLocations.Num();
 
 	// Spawn the new actor (Using GetClass() instead of AMySpawner so that if someone derives a new class  
@@ -398,7 +434,7 @@ void AFlightSimulatorVRPawn::Fire(class AWeapon* WeaponTemplate, const TArray<FV
 
 	UE_LOG(LogTemp, Warning, TEXT("AFlightSimulatorVRPawn::Fire %s"), *WeaponTemplate->GetWeaponClass()->GetName());
 
-	AWeapon* NewActor = GetWorld()->SpawnActor<AWeapon>(WeaponTemplate->GetWeaponClass(), NewLocation, ActorRotation, Parameters);
+	AWeapon* NewActor = GetWorld()->SpawnActor<AWeapon>(WeaponTemplate->GetWeaponClass(), NewLocation, WeaponRotation, Parameters);
 	if (NewActor)
 	{
 		NewActor->Activate(this);
@@ -416,4 +452,55 @@ void AFlightSimulatorVRPawn::FirePrimary()
 void AFlightSimulatorVRPawn::FireSecondary()
 {
 	Fire(SecondaryWeaponTemplate, SecondaryWeaponLocations, CurrentSecondaryWeapon);
+}
+
+void AFlightSimulatorVRPawn::PlayFireworks()
+{
+	CurrentFireworksTexture = 0;
+	CurrentFireworksPoint = 0;
+
+	UE_LOG(LogTemp, Warning, TEXT("AFlightSimulatorVRPawn::PlayFireworks %d"), Fireworks.Num());
+
+	GetWorldTimerManager().SetTimer(FireworksTimerHandle, this, &AFlightSimulatorVRPawn::PlayNextFirework, 1.f, false, 0.f);
+}
+
+void AFlightSimulatorVRPawn::PlayNextFirework()
+{
+	if (CurrentFireworksTexture >= Fireworks.Num())
+	{
+		if (FireworksFinaleTemplate)
+		{
+			TArray<FVector> FireworksFinaleLocations;
+			FireworksFinaleLocations.Add(FireworksFinaleLocation);
+			int32 CurrentFireworksFinale = 0;
+
+			Fire(FireworksFinaleTemplate, FireworksFinaleLocations, CurrentFireworksFinale);
+		}
+		
+		GetWorldTimerManager().ClearTimer(FireworksTimerHandle);
+		return;
+	}
+
+	TArray<FVector> & CurrentFirework = Fireworks[CurrentFireworksTexture];
+
+	if (CurrentFireworksPoint >= CurrentFirework.Num())
+	{
+		CurrentFireworksTexture += 1;
+		CurrentFireworksPoint = 0;
+
+		GetWorldTimerManager().SetTimer(FireworksTimerHandle, this, &AFlightSimulatorVRPawn::PlayNextFirework, 1.f, false, FireworksFirePause);
+		return;
+	}
+	
+	FVector & CurrentPoint = CurrentFirework[CurrentFireworksPoint];
+
+	if (FMath::Rand() % 50 == 0)
+		UE_LOG(LogTemp, Warning, TEXT("AFlightSimulatorVRPawn::PlayNextFirework %d/%d %d/%d = %.4f %.4f %.4f"), CurrentFireworksTexture, Fireworks.Num(), CurrentFireworksPoint, CurrentFirework.Num(), CurrentPoint.X, CurrentPoint.Y, CurrentPoint.Z);
+
+	FRotator Rotation = GetActorRotation();
+	Rotation.Add(FireworksScale * CurrentPoint.Y, FireworksScale * CurrentPoint.X, 0);
+	Fire(FireworksTemplate, FireworksLocations, CurrentFireworksSlot, Rotation);
+
+	CurrentFireworksPoint += 1;
+	GetWorldTimerManager().SetTimer(FireworksTimerHandle, this, &AFlightSimulatorVRPawn::PlayNextFirework, 1.f, false, FireworksFireRate * CurrentPoint.Z);
 }

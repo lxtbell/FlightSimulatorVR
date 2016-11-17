@@ -82,8 +82,11 @@ protected:
 	virtual void RollRightInput(float Val);
 
 	virtual void Fire(class AWeapon* WeaponTemplate, const TArray<FVector> & WeaponLocations, int32 & CurrentWeapon);
+	virtual void Fire(class AWeapon* WeaponTemplate, const TArray<FVector> & WeaponLocations, int32 & CurrentWeapon, const FRotator & WeaponRotation);
 	virtual void FirePrimary();
 	virtual void FireSecondary();
+	virtual void PlayFireworks();
+	virtual void PlayNextFirework();
 
 private:
 	/** Max forward speed */
@@ -135,6 +138,33 @@ private:
 	UPROPERTY(Category = SecondaryWeapon, EditAnywhere)
 	TArray<FVector> SecondaryWeaponLocations;
 
+	UPROPERTY(Category = Fireworks, EditAnywhere)
+	class AWeapon* FireworksTemplate;
+
+	UPROPERTY(Category = Fireworks, EditAnywhere)
+	float FireworksFireRate;
+
+	UPROPERTY(Category = Fireworks, EditAnywhere)
+	float FireworksFirePause;
+
+	UPROPERTY(Category = Fireworks, EditAnywhere)
+	TArray<FVector> FireworksLocations;
+
+	UPROPERTY(Category = Fireworks, EditAnywhere)
+	float FireworksScale;
+
+	UPROPERTY(Category = Fireworks, EditAnywhere)
+	class AWeapon* FireworksFinaleTemplate;
+
+	UPROPERTY(Category = Fireworks, EditAnywhere)
+	FVector FireworksFinaleLocation;
+
+	UPROPERTY(Category = Fireworks, EditAnywhere)
+	TArray<UTexture2D*> FireworksTextures;
+
+	UPROPERTY(Category = Sound, EditAnywhere)
+	TArray<USoundCue*> StreakSounds;
+
 	UPROPERTY(Category = Misc, EditAnywhere)
 	float SelfDestructionDamage;
 
@@ -152,9 +182,6 @@ private:
 
 	UPROPERTY(Category = Misc, EditAnywhere)
 	float ExplodedTimeDilation;
-
-	UPROPERTY(Category = Sound, EditAnywhere)
-	TArray<USoundCue*> StreakSounds;
 
 	UPROPERTY(Category = Misc, EditAnywhere)
 	FPostProcessSettings ExplodedLensSettings;
@@ -179,6 +206,12 @@ private:
 
 	FTimerHandle SecondaryWeaponTimerHandle;
 	int32 CurrentSecondaryWeapon;
+
+	TArray<TArray<FVector>> Fireworks;
+	FTimerHandle FireworksTimerHandle;
+	int32 CurrentFireworksSlot;
+	int32 CurrentFireworksTexture;
+	int32 CurrentFireworksPoint;
 
 	enum class Stage
 	{
