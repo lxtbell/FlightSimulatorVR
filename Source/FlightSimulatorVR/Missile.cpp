@@ -47,7 +47,7 @@ AMissile::AMissile()
 
 	LockTime = 0.2f;
 	FlyTime = 30.f;
-	BurnTime = 10.0f;
+	BurnTime = 5.0f;
 	InitialSpeed = 50.f;
 	MaxSpeed = 6000.f;
 	Acceleration = 0.01f;
