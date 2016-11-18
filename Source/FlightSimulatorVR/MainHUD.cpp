@@ -61,11 +61,11 @@ void AMainHUD::PostRender()
 	{
 	case Mode::MainMenu:
 		DrawTexture(MenuBackground, 0, 0, ScreenX, ScreenY, 0, 0, 1, 1);
-		Buttons[TEXT("Flight Simulator VR")]->Set(ScreenX * 0.3, ScreenY * 0.1, MenuFont, FontScale * 120, FVector2D(12, 1.5) * FontSize * 120)->Draw(this);
+		//Buttons[TEXT("Flight Simulator VR")]->Set(ScreenX * 0.3, ScreenY * 0.1, MenuFont, FontScale * 120, FVector2D(12, 1.5) * FontSize * 120)->Draw(this);
 
-		Buttons[TEXT("Start Game")]->Set(ScreenX * 0.1, ScreenY * 0.6, MenuFont, FontScale * 60, FVector2D(6.6, 1.5) * FontSize * 60)->Draw(this);
-		Buttons[TEXT("Start With Tutorial")]->Set(ScreenX * 0.1, ScreenY * 0.7, MenuFont, FontScale * 60, FVector2D(11, 1.5) * FontSize * 60)->Draw(this);
-		Buttons[TEXT("Exit Game")]->Set(ScreenX * 0.1, ScreenY * 0.8, MenuFont, FontScale * 60, FVector2D(6, 1.5) * FontSize * 60)->Draw(this);
+		//Buttons[TEXT("Start Game")]->Set(ScreenX * 0.1, ScreenY * 0.6, MenuFont, FontScale * 60, FVector2D(6.6, 1.5) * FontSize * 60)->Draw(this);
+		//Buttons[TEXT("Start With Tutorial")]->Set(ScreenX * 0.1, ScreenY * 0.7, MenuFont, FontScale * 60, FVector2D(11, 1.5) * FontSize * 60)->Draw(this);
+		//Buttons[TEXT("Exit Game")]->Set(ScreenX * 0.1, ScreenY * 0.8, MenuFont, FontScale * 60, FVector2D(6, 1.5) * FontSize * 60)->Draw(this);
 		break;
 	case Mode::InGameTutorial:
 	case Mode::InGame:

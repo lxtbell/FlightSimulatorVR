@@ -125,7 +125,7 @@ void AFlightSimulatorVRPawn::BeginPlay()
 		if (HUD && HUD->IsA(AMainHUD::StaticClass()))
 		{
 			MainHUD = Cast<AMainHUD>(HUD);
-			MainHUD->SetMode(AMainHUD::Mode::InGame);
+			//MainHUD->SetMode(AMainHUD::Mode::InGame);
 		}
 	}
 
@@ -249,6 +249,7 @@ void AFlightSimulatorVRPawn::SetupPlayerInputComponent(class UInputComponent* Pl
 	check(PlayerInputComponent);
 
 	// Bind our control axis' to callback functions
+	PlayerInputComponent->BindAction("Start", IE_Pressed, this, &AFlightSimulatorVRPawn::StartGame);
 	PlayerInputComponent->BindAction("Exit", IE_Pressed, this, &AFlightSimulatorVRPawn::ExitGame);
 	PlayerInputComponent->BindAction("FirePrimary", IE_Pressed, this, &AFlightSimulatorVRPawn::StartFirePrimary);
 	PlayerInputComponent->BindAction("FirePrimary", IE_Released, this, &AFlightSimulatorVRPawn::StopFirePrimary);
@@ -259,6 +260,14 @@ void AFlightSimulatorVRPawn::SetupPlayerInputComponent(class UInputComponent* Pl
 	PlayerInputComponent->BindAxis("YawRight", this, &AFlightSimulatorVRPawn::YawRightInput);
 	PlayerInputComponent->BindAxis("Thrust", this, &AFlightSimulatorVRPawn::ThrustInput);
 	PlayerInputComponent->BindAxis("RollRight", this, &AFlightSimulatorVRPawn::RollRightInput);
+}
+
+void AFlightSimulatorVRPawn::StartGame()
+{
+	if (MainHUD != nullptr)
+	{
+		MainHUD->SetMode(AMainHUD::Mode::InGame);
+	}
 }
 
 void AFlightSimulatorVRPawn::ExitGame()
