@@ -33,8 +33,8 @@ AFlightSimulatorVRPawn::AFlightSimulatorVRPawn()
 	MainMenu = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MainMenu0"));
 	MainMenu->SetupAttachment(PlaneHUD);
 
-	ScoreHUD = CreateDefaultSubobject<UTextRenderComponent>(TEXT("ScoreHUD0"));
-	ScoreHUD->SetupAttachment(PlaneHUD);
+	ScoreText = CreateDefaultSubobject<UTextRenderComponent>(TEXT("ScoreHUD0"));
+	ScoreText->SetupAttachment(PlaneHUD);
 
 	// Create a spring arm component
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm0"));
@@ -356,12 +356,12 @@ void AFlightSimulatorVRPawn::ThrustInput(float Val)
 	//bool bHasInput = !FMath::IsNearlyEqual(Val, 0.f);
 
 	// Calculate new speed
-	CurrentTargetSpeed = FMath::Clamp(CurrentTargetSpeed + Val * TargetSpeedChangeSpeed, MinSpeed, MaxSpeed);
+	CurrentTargetSpeed = FMath::Clamp(CurrentTargetSpeed + Val * TargetSpeedChangeSpeed * GetWorld()->GetDeltaSeconds(), MinSpeed, MaxSpeed);
 	float CurrentAcc = Acceleration * (CurrentTargetSpeed - CurrentForwardSpeed);
 	float NewForwardSpeed = CurrentForwardSpeed + (GetWorld()->GetDeltaSeconds() * CurrentAcc);
 
-	if (FMath::Rand() % 100 == 0)
-		UE_LOG(LogTemp, Warning, TEXT("AFlightSimulatorVRPawn::ThrustInput %.2f %.2f %.2f %.2f"), Val, CurrentTargetSpeed, CurrentAcc, NewForwardSpeed);
+	//if (FMath::Rand() % 100 == 0)
+	//	UE_LOG(LogTemp, Warning, TEXT("AFlightSimulatorVRPawn::ThrustInput %.2f %.2f %.2f %.2f"), Val, CurrentTargetSpeed, CurrentAcc, NewForwardSpeed);
 
 	// Clamp between MinSpeed and MaxSpeed
 	//CurrentForwardSpeed = FMath::Clamp(NewForwardSpeed, MinSpeed, MaxSpeed);
