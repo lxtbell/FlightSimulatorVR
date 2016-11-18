@@ -51,6 +51,8 @@ public:
 private:
 	Mode CurrentMode;
 
+	class AFlightSimulatorVRPawn* FlightPawn;
+
 	class APilotState* PilotState;
 
 	struct UButton
