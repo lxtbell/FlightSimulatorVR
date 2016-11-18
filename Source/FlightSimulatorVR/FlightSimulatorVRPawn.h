@@ -33,7 +33,7 @@ class AFlightSimulatorVRPawn : public APawn
 	class UStaticMeshComponent* MainMenu;
 
 	UPROPERTY(Category = Camera, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	class UTextRenderComponent* ScoreHUD;
+	class UTextRenderComponent* ScoreText;
 
 	UPROPERTY(Category = Camera, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UTextRenderComponent* GameOverText;
@@ -195,7 +195,7 @@ private:
 public:
 	FORCEINLINE class UStaticMeshComponent* GetMainMenu() const { return MainMenu; }
 
-	FORCEINLINE class UTextRenderComponent* GetScoreHUD() const { return ScoreHUD; }
+	FORCEINLINE class UTextRenderComponent* GetScoreText() const { return ScoreText; }
 
 	FORCEINLINE class UTextRenderComponent* GetGameOverText() const { return GameOverText; }
 
