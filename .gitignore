@@ -246,7 +246,6 @@ ModelManifest.xml
 
 # Unreal
 Binaries/
-Config/
 Content/
 Debug/
 Intermediate/
