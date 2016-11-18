@@ -26,6 +26,18 @@ class AFlightSimulatorVRPawn : public APawn
 	UPROPERTY(Category = Camera, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* Camera;
 
+	UPROPERTY(Category = Camera, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	class UStaticMeshComponent* PlaneHUD;
+
+	UPROPERTY(Category = Camera, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	class UStaticMeshComponent* MainMenu;
+
+	UPROPERTY(Category = Camera, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	class UTextRenderComponent* ScoreHUD;
+
+	UPROPERTY(Category = Camera, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	class UTextRenderComponent* GameOverText;
+
 	UPROPERTY(Category = Physics, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UParticleSystemComponent* Explosion;
 
@@ -181,6 +193,12 @@ private:
 	class APilotState* PilotState;
 
 public:
+	FORCEINLINE class UStaticMeshComponent* GetMainMenu() const { return MainMenu; }
+
+	FORCEINLINE class UTextRenderComponent* GetScoreHUD() const { return ScoreHUD; }
+
+	FORCEINLINE class UTextRenderComponent* GetGameOverText() const { return GameOverText; }
+
 	FORCEINLINE class APilotState* GetPilotState() const { return PilotState; }
 
 	FORCEINLINE float GetForwardSpeed() const { return CurrentForwardSpeed; }

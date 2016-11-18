@@ -13,6 +13,7 @@
 #include "TargetSphere.h"
 #include "PilotState.h"
 #include "MainHUD.h"
+#include "Components/TextRenderComponent.h"
 
 #include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
 #include "Runtime/Engine/Classes/Engine/Scene.h"
@@ -25,6 +26,15 @@ AFlightSimulatorVRPawn::AFlightSimulatorVRPawn()
 	Plane = CreateDefaultSubobject<UDestructibleComponent>(TEXT("Plane0"));
 	//Plane->SetCollisionProfileName(TEXT("OverlapAll"));
 	RootComponent = Plane;
+
+	PlaneHUD = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PlaneHUD0"));
+	PlaneHUD->SetupAttachment(Plane);
+
+	MainMenu = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MainMenu0"));
+	MainMenu->SetupAttachment(PlaneHUD);
+
+	ScoreHUD = CreateDefaultSubobject<UTextRenderComponent>(TEXT("ScoreHUD0"));
+	ScoreHUD->SetupAttachment(PlaneHUD);
 
 	// Create a spring arm component
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm0"));
@@ -39,6 +49,9 @@ AFlightSimulatorVRPawn::AFlightSimulatorVRPawn()
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera0"));
 	Camera->SetupAttachment(SpringArm, USpringArmComponent::SocketName);
 	Camera->bUsePawnControlRotation = false; // Don't rotate camera with controller
+
+	GameOverText = CreateDefaultSubobject<UTextRenderComponent>(TEXT("GameOverText0"));
+	GameOverText->SetupAttachment(Camera);
 
 	Explosion = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Explosion0"));
 	Explosion->SetupAttachment(Plane);
@@ -264,7 +277,7 @@ void AFlightSimulatorVRPawn::SetupPlayerInputComponent(class UInputComponent* Pl
 
 void AFlightSimulatorVRPawn::StartGame()
 {
-	if (MainHUD != nullptr)
+	if (CurrentStage == Stage::Created && MainHUD != nullptr)
 	{
 		MainHUD->SetMode(AMainHUD::Mode::InGame);
 	}

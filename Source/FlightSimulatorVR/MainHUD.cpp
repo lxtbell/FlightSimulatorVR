@@ -7,6 +7,7 @@
 #include "Engine/Canvas.h"
 #include "PilotState.h"
 #include "ResourceGuy.h"
+#include "Components/TextRenderComponent.h"
 
 
 AMainHUD::AMainHUD()
@@ -19,6 +20,10 @@ AMainHUD::AMainHUD()
 	Buttons.Add(TEXT("Statistics"), (new UButton())->Set(TEXT("Statistics"), FColor::White, FColor::White));
 
 	Buttons.Add(TEXT("Wasted"), (new UButton())->Set(TEXT("Wasted"), FColor::Red, FColor::Red));
+
+	MenuBackground = nullptr;
+	MenuFont = nullptr;
+	WastedFont = nullptr;
 }
 
 // Called when the game starts or when spawned
@@ -26,11 +31,14 @@ void AMainHUD::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	SetMode(Mode::MainMenu);
-
+	FlightPawn = nullptr;
 	PilotState = nullptr;
 	if (PlayerOwner)
 	{
+		APawn* Pawn = PlayerOwner->GetPawn();
+		if (Pawn && Pawn->IsA(AFlightSimulatorVRPawn::StaticClass()))
+			FlightPawn = Cast<AFlightSimulatorVRPawn>(Pawn);
+
 		APlayerState* PlayerState = PlayerOwner->PlayerState;
 		if (PlayerState && PlayerState->IsA(APilotState::StaticClass()))
 			PilotState = Cast<APilotState>(PlayerState);
@@ -43,16 +51,21 @@ void AMainHUD::BeginPlay()
 		MenuFont = ResourceGuy->AMainHUD_MenuFont;
 		WastedFont = ResourceGuy->AMainHUD_WastedFont;
 	}
+
+	SetMode(Mode::MainMenu);
 }
 
 void AMainHUD::PostRender()
 {
 	Super::PostRender();
 
-	float ScreenX = Canvas->SizeX, ScreenY = Canvas->SizeY;
+	//if (MenuBackground == nullptr || MenuFont == nullptr || WastedFont == nullptr)
+	//	return;
 
-	float FontSize = FMath::Min(ScreenX / 1920, ScreenY / 1080);
-	float FontScale = FontSize / MenuFont->LegacyFontSize;
+	//float ScreenX = Canvas->SizeX, ScreenY = Canvas->SizeY;
+
+	//float FontSize = FMath::Min(ScreenX / 1920, ScreenY / 1080);
+	//float FontScale = FontSize / MenuFont->LegacyFontSize;
 
 	//if (FMath::Rand() % 100 == 0)
 	//	UE_LOG(LogTemp, Warning, TEXT("AMainHUD::PostRender %.4f"), FontSize);
@@ -60,7 +73,7 @@ void AMainHUD::PostRender()
 	switch (CurrentMode)
 	{
 	case Mode::MainMenu:
-		DrawTexture(MenuBackground, 0, 0, ScreenX, ScreenY, 0, 0, 1, 1);
+		//DrawTexture(MenuBackground, 0, 0, ScreenX, ScreenY, 0, 0, 1, 1);
 		//Buttons[TEXT("Flight Simulator VR")]->Set(ScreenX * 0.3, ScreenY * 0.1, MenuFont, FontScale * 120, FVector2D(12, 1.5) * FontSize * 120)->Draw(this);
 
 		//Buttons[TEXT("Start Game")]->Set(ScreenX * 0.1, ScreenY * 0.6, MenuFont, FontScale * 60, FVector2D(6.6, 1.5) * FontSize * 60)->Draw(this);
@@ -69,18 +82,24 @@ void AMainHUD::PostRender()
 		break;
 	case Mode::InGameTutorial:
 	case Mode::InGame:
-		if (PilotState != nullptr)
+		if (FlightPawn != nullptr && PilotState != nullptr)
 		{
-			Buttons[TEXT("Statistics")]
-				->Set(FString::Printf(TEXT("Score %3.0f\tScore Per Minute %2.0f\tAccuracy %.2f\tCurrent Streak %3d"),
-					PilotState->Score, PilotState->GetScorePerMinute(), PilotState->GetAccuracy(), PilotState->CurrentStreak), FColor::White, FColor::White)
-				->Set(ScreenX * 0.5, ScreenY * 0.95, MenuFont, FontScale * 40, FVector2D(38.6, 1.5) * FontSize * 40)
-				->Draw(this, UButton::Alignment::Center);
+			//Buttons[TEXT("Statistics")]
+			//	->Set(FString::Printf(TEXT("Score %3.0f\tScore Per Minute %2.0f\tAccuracy %.2f\tCurrent Streak %3d"),
+			//		PilotState->Score, PilotState->GetScorePerMinute(), PilotState->GetAccuracy(), PilotState->CurrentStreak), FColor::White, FColor::White)
+			//	->Set(ScreenX * 0.5, ScreenY * 0.95, MenuFont, FontScale * 40, FVector2D(38.6, 1.5) * FontSize * 40)
+			//	->Draw(this, UButton::Alignment::Center);
+			FlightPawn->GetScoreHUD()->SetText(FString::Printf(TEXT("Score %3.0f    Score Per Minute %2.0f\nAccuracy %.2f    Current Streak %3d"),
+				PilotState->Score, PilotState->GetScorePerMinute(), PilotState->GetAccuracy(), PilotState->CurrentStreak));
 		}
 		break;
 	case Mode::GameOver:
-		Buttons[TEXT("Wasted")]->Set(ScreenX * 0.5, ScreenY * 0.5, WastedFont, FontScale * 110, FVector2D(4.6, 1.5) * FontSize * 110)->Draw(this, UButton::Alignment::Center);
-		Buttons[TEXT("Exit Game")]->Set(ScreenX, ScreenY, MenuFont, FontScale * 40, FVector2D(6, 1.5) * FontSize * 40)->Draw(this, UButton::Alignment::BottomRight);
+		if (FlightPawn != nullptr)
+		{
+			FlightPawn->GetGameOverText()->SetText(TEXT("Wasted"));
+		}
+		//Buttons[TEXT("Wasted")]->Set(ScreenX * 0.5, ScreenY * 0.5, WastedFont, FontScale * 110, FVector2D(4.6, 1.5) * FontSize * 110)->Draw(this, UButton::Alignment::Center);
+		//Buttons[TEXT("Exit Game")]->Set(ScreenX, ScreenY, MenuFont, FontScale * 40, FVector2D(6, 1.5) * FontSize * 40)->Draw(this, UButton::Alignment::BottomRight);
 		break;
 	}
 
@@ -91,26 +110,37 @@ void AMainHUD::SetMode(Mode NewMode)
 {
 	CurrentMode = NewMode;
 
-	if (!PlayerOwner)
+	if (!PlayerOwner || FlightPawn == nullptr)
 		return;
+
+	FlightPawn->GetMainMenu()->SetVisibility(false);
+	FlightPawn->GetScoreHUD()->SetVisibility(false);
+	FlightPawn->GetGameOverText()->SetVisibility(false);
 
 	switch (CurrentMode)
 	{
 	case Mode::MainMenu:
+		FlightPawn->GetMainMenu()->SetVisibility(true);
+
+		PlayerOwner->bShowMouseCursor = true;
+		PlayerOwner->bEnableMouseOverEvents = true;
+		PlayerOwner->bEnableClickEvents = true;
+		break;
 	case Mode::GameOver:
+		FlightPawn->GetGameOverText()->SetVisibility(true);
+
 		PlayerOwner->bShowMouseCursor = true;
 		PlayerOwner->bEnableMouseOverEvents = true;
 		PlayerOwner->bEnableClickEvents = true;
 		break;
 	case Mode::InGame:
 	case Mode::InGameTutorial:
+		FlightPawn->GetScoreHUD()->SetVisibility(true);
+		FlightPawn->StartFlying();
+
 		PlayerOwner->bShowMouseCursor = false;
 		PlayerOwner->bEnableMouseOverEvents = false;
 		PlayerOwner->bEnableClickEvents = false;
-
-		APawn* Pawn = PlayerOwner->GetPawn();
-		if (Pawn->IsA(AFlightSimulatorVRPawn::StaticClass()))
-			Cast<AFlightSimulatorVRPawn>(Pawn)->StartFlying();
 		break;
 	}
 }
