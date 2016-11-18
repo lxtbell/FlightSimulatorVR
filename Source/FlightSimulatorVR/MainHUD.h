@@ -66,7 +66,7 @@ private:
 			BottomRight
 		};
 
-		UButton* Set(FString Name, FLinearColor NormalColor, FLinearColor HighlightColor)
+		UButton* Set(const FString & Name, const FLinearColor & NormalColor, const FLinearColor & HighlightColor)
 		{
 			ButtonName = Name; ButtonNormalColor = NormalColor; ButtonHighlightColor = HighlightColor;
 			CurrentColor = ButtonNormalColor;
@@ -93,6 +93,9 @@ private:
 				ScreenLocation -= ButtonHitBoxScale;
 				break;
 			}
+
+			if (FMath::Rand() % 500 == 0)
+				UE_LOG(LogTemp, Warning, TEXT("AMainHUD::UButton::Draw %s"), *ButtonName);
 
 			HUD->DrawText(ButtonName, CurrentColor, ScreenLocation.X, ScreenLocation.Y, ButtonFont, ButtonFontScale);
 			HUD->AddHitBox(ScreenLocation, ButtonHitBoxScale, FName(*ButtonName), true);
