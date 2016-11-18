@@ -98,6 +98,9 @@ private:
 	UPROPERTY(Category = Plane, EditAnywhere)
 	float NaturalSpeed;
 
+	UPROPERTY(Category = Plane, EditAnywhere)
+	float TargetSpeedChangeSpeed;
+
 	/** How quickly forward speed changes */
 	UPROPERTY(Category = Plane, EditAnywhere)
 	float Acceleration;
@@ -157,10 +160,7 @@ private:
 	FPostProcessSettings ExplodedLensSettings;
 
 	/** Throttle interpolation */
-
-	float ThrottleA;
-	float ThrottleB;
-	float ThrottleC;
+	float CurrentTargetSpeed;
 
 	/** Current forward speed */
 	float CurrentForwardSpeed;

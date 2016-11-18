@@ -75,6 +75,7 @@ AFlightSimulatorVRPawn::AFlightSimulatorVRPawn()
 	MaxSpeed = 4000.f;
 	MinSpeed = 250.f;
 	NaturalSpeed = 1000.f;
+	TargetSpeedChangeSpeed = 4000.f;
 	Acceleration = 1.f;
 	PitchSpeed = 90.f;
 	YawSpeed = 15.f;
@@ -118,9 +119,7 @@ void AFlightSimulatorVRPawn::BeginPlay()
 	Super::BeginPlay();
 	UE_LOG(LogTemp, Warning, TEXT("AFlightSimulatorVRPawn::BeginPlay"));
 
-	ThrottleA = NaturalSpeed;
-	ThrottleB = (MaxSpeed - MinSpeed) / 2;
-	ThrottleC = (MaxSpeed + MinSpeed) / 2 - NaturalSpeed;
+	CurrentTargetSpeed = NaturalSpeed;
 	CurrentForwardSpeed = NaturalSpeed;
 	CurrentPitchSpeed = 0.f;
 	CurrentYawSpeed = 0.f;
@@ -357,9 +356,12 @@ void AFlightSimulatorVRPawn::ThrustInput(float Val)
 	//bool bHasInput = !FMath::IsNearlyEqual(Val, 0.f);
 
 	// Calculate new speed
-	float JetSpeed = ThrottleA + ThrottleB * Val + ThrottleC * Val * Val;
-	float CurrentAcc = Acceleration * (JetSpeed - CurrentForwardSpeed);
+	CurrentTargetSpeed = FMath::Clamp(CurrentTargetSpeed + Val * TargetSpeedChangeSpeed, MinSpeed, MaxSpeed);
+	float CurrentAcc = Acceleration * (CurrentTargetSpeed - CurrentForwardSpeed);
 	float NewForwardSpeed = CurrentForwardSpeed + (GetWorld()->GetDeltaSeconds() * CurrentAcc);
+
+	if (FMath::Rand() % 100 == 0)
+		UE_LOG(LogTemp, Warning, TEXT("AFlightSimulatorVRPawn::ThrustInput %.2f %.2f %.2f %.2f"), Val, CurrentTargetSpeed, CurrentAcc, NewForwardSpeed);
 
 	// Clamp between MinSpeed and MaxSpeed
 	//CurrentForwardSpeed = FMath::Clamp(NewForwardSpeed, MinSpeed, MaxSpeed);
