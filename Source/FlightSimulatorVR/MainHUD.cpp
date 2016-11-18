@@ -11,14 +11,14 @@
 
 AMainHUD::AMainHUD()
 {
-	Buttons.Add(TEXT("Flight Simulator VR"), (new UButton())->Set(TEXT("Flight Simulator VR"), WhiteColor, RedColor));
-	Buttons.Add(TEXT("Start Game"), (new UButtonStartGame())->Set(TEXT("Start Game"), WhiteColor, RedColor));
-	Buttons.Add(TEXT("Start With Tutorial"), (new UButtonStartWithTutorial())->Set(TEXT("Start With Tutorial"), WhiteColor, RedColor));
-	Buttons.Add(TEXT("Exit Game"), (new UButtonExitGame())->Set(TEXT("Exit Game"), WhiteColor, RedColor));
+	Buttons.Add(TEXT("Flight Simulator VR"), (new UButton())->Set(TEXT("Flight Simulator VR"), FColor::White, FColor::Red));
+	Buttons.Add(TEXT("Start Game"), (new UButtonStartGame())->Set(TEXT("Start Game"), FColor::White, FColor::Red));
+	Buttons.Add(TEXT("Start With Tutorial"), (new UButtonStartWithTutorial())->Set(TEXT("Start With Tutorial"), FColor::White, FColor::Red));
+	Buttons.Add(TEXT("Exit Game"), (new UButtonExitGame())->Set(TEXT("Exit Game"), FColor::White, FColor::Red));
 
-	Buttons.Add(TEXT("Statistics"), (new UButton())->Set(TEXT("Statistics"), WhiteColor, WhiteColor));
+	Buttons.Add(TEXT("Statistics"), (new UButton())->Set(TEXT("Statistics"), FColor::White, FColor::White));
 
-	Buttons.Add(TEXT("Wasted"), (new UButton())->Set(TEXT("Wasted"), RedColor, RedColor));
+	Buttons.Add(TEXT("Wasted"), (new UButton())->Set(TEXT("Wasted"), FColor::Red, FColor::Red));
 }
 
 // Called when the game starts or when spawned
@@ -72,9 +72,9 @@ void AMainHUD::PostRender()
 		if (PilotState != nullptr)
 		{
 			Buttons[TEXT("Statistics")]
-				->Set(FString::Printf(TEXT("Score %3.0f\tScore Per Minute %2.0f\tAccuracy %.2f\tCurrentStreak %3d"),
-					PilotState->Score, PilotState->GetScorePerMinute(), PilotState->GetAccuracy(), PilotState->CurrentStreak), WhiteColor, WhiteColor)
-				->Set(ScreenX * 0.5, ScreenY * 0.95, MenuFont, FontScale * 40, FVector2D(38.4, 1.5) * FontSize * 40)
+				->Set(FString::Printf(TEXT("Score %3.0f\tScore Per Minute %2.0f\tAccuracy %.2f\tCurrent Streak %3d"),
+					PilotState->Score, PilotState->GetScorePerMinute(), PilotState->GetAccuracy(), PilotState->CurrentStreak), FColor::White, FColor::White)
+				->Set(ScreenX * 0.5, ScreenY * 0.95, MenuFont, FontScale * 40, FVector2D(38.6, 1.5) * FontSize * 40)
 				->Draw(this, UButton::Alignment::Center);
 		}
 		break;
