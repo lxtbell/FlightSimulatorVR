@@ -356,7 +356,7 @@ void AFlightSimulatorVRPawn::ThrustInput(float Val)
 	//bool bHasInput = !FMath::IsNearlyEqual(Val, 0.f);
 
 	// Calculate new speed
-	CurrentTargetSpeed = FMath::Clamp(CurrentTargetSpeed + Val * TargetSpeedChangeSpeed, MinSpeed, MaxSpeed);
+	CurrentTargetSpeed = FMath::Clamp(CurrentTargetSpeed + Val * TargetSpeedChangeSpeed * GetWorld()->GetDeltaSeconds(), MinSpeed, MaxSpeed);
 	float CurrentAcc = Acceleration * (CurrentTargetSpeed - CurrentForwardSpeed);
 	float NewForwardSpeed = CurrentForwardSpeed + (GetWorld()->GetDeltaSeconds() * CurrentAcc);
 
